@@ -32,13 +32,18 @@ def analyze_patient(
     Pain Level: {pain_level}
     Breathing Difficulty: {breathing_issue}
 
-    Return ONLY:
+    Return in exactly this format:
 
-    Risk Level:
-    Reason: (max 2 lines)
-    Recommended Action: (max 2 lines)
+    ## Risk Level
+    <risk>
 
-    Keep the entire response under 100 words.
+    ## Reason
+    <short reason>
+
+    ## Recommended Action
+    <short action>
+
+    Keep the entire response under 80 words.
     """
 
     response = model.generate_content(prompt)

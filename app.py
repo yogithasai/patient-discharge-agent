@@ -148,4 +148,4 @@ elif menu == "Patient Follow-Up":
 
         st.subheader("🤖 AI Medical Assessment")
 
-        st.write(ai_result)
+        st.markdown(ai_result)

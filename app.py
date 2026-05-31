@@ -1,7 +1,10 @@
 from gemini_agent import analyze_patient
 import streamlit as st
 
-from notifications import send_whatsapp
+from notifications import (
+    send_whatsapp,
+    send_staff_alert
+)
 
 from gemini_agent import (
     analyze_patient,
@@ -194,9 +197,20 @@ elif menu == "Patient Follow-Up":
             f"Risk Level: {risk}"
         )
 
-        if risk == "High":
+        if "high" in risk.lower() or "critical" in risk.lower():
+
             st.error(
                 "⚠ Immediate Doctor Attention Required"
+            )
+
+            staff_sid = send_staff_alert(
+                patient_name,
+                symptoms,
+                risk
+            )
+
+            st.warning(
+                "🚨 Staff Alert Sent Successfully"
             )
 
         with st.spinner("AI analyzing patient condition..."):
@@ -211,9 +225,9 @@ elif menu == "Patient Follow-Up":
                         breathing_issue
                     )
 
-        st.subheader("🤖 AI Medical Assessment")
+            st.subheader("🤖 AI Medical Assessment")
 
-        st.markdown(ai_result)
+            st.markdown(ai_result)
 
 elif menu == "Dashboard":
 
@@ -297,14 +311,14 @@ elif menu == "Staff Alerts":
         for record in high_risk:
 
             st.error(
-                f"""
-Patient: {record[1]}
+                        f"""
+        Patient: {record[1]}
 
-Risk Level: {record[7]}
+        Risk Level: {record[7]}
 
-Symptoms: {record[2]}
-"""
-            )
+        Symptoms: {record[2]}
+        """
+                    )
 
 elif menu == "Patient Outreach":
 

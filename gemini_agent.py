@@ -1,4 +1,5 @@
 import os
+from urllib import response
 from dotenv import load_dotenv
 import google.generativeai as genai
 
@@ -39,3 +40,7 @@ def analyze_patient(
 
     Keep the entire response under 100 words.
     """
+
+    response = model.generate_content(prompt)
+    return response.text
+

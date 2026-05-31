@@ -4,7 +4,10 @@ import streamlit as st
 from database import (
     init_db,
     add_patient,
-    get_patients
+    get_patients,
+    add_followup,
+    get_followups,
+    get_patient_by_name
 )
 
 init_db()
@@ -16,7 +19,8 @@ menu = st.sidebar.selectbox(
     [
         "Register Patient",
         "Patient Follow-Up",
-        "View Patients"
+        "View Patients",
+        "Dashboard"
     ]
 )
 
@@ -91,11 +95,42 @@ elif menu == "Patient Follow-Up":
     patient_name = st.text_input(
         "Patient Name"
     )
+    
+    if patient_name:
+
+        patient = get_patient_by_name(
+            patient_name
+        )
+
+        if patient:
+
+            st.info(
+                f"💊 Medication Reminder: {patient[5]}"
+            )
+
+            st.info(
+                f"📅 Next Follow-Up Appointment: {patient[6]}"
+            )
 
     symptoms = st.text_area(
         "Describe Symptoms"
     )
 
+    recovery_status = st.selectbox(
+        "Recovery Progress",
+        [
+            "Improving",
+            "Same",
+            "Worsening"
+        ]
+    )
+
+    recovery_score = st.slider(
+        "Recovery Score (1-10)",
+        1,
+        10,
+        5
+    )
     medication_taken = st.selectbox(
         "Medication Taken?",
         ["Yes", "No"]
@@ -127,6 +162,16 @@ elif menu == "Patient Follow-Up":
             medication_taken
         )
 
+        add_followup(
+                patient_name,
+                symptoms,
+                medication_taken,
+                fever,
+                pain_level,
+                breathing_issue,
+                risk
+            )
+
         st.success(
             f"Risk Level: {risk}"
         )
@@ -139,13 +184,75 @@ elif menu == "Patient Follow-Up":
         with st.spinner("AI analyzing patient condition..."):
 
             ai_result = analyze_patient(
-                symptoms,
-                medication_taken,
-                fever,
-                pain_level,
-                breathing_issue
-            )
+                        symptoms,
+                        recovery_status,
+                        recovery_score,
+                        medication_taken,
+                        fever,
+                        pain_level,
+                        breathing_issue
+                    )
 
         st.subheader("🤖 AI Medical Assessment")
 
         st.markdown(ai_result)
+
+elif menu == "Dashboard":
+
+    st.header("📊 Healthcare Dashboard")
+
+    records = get_followups()
+
+    total = len(records)
+
+    high = len(
+        [r for r in records if r[7] == "High"]
+    )
+
+    medium = len(
+        [r for r in records if r[7] == "Medium"]
+    )
+
+    low = len(
+        [r for r in records if r[7] == "Low"]
+    )
+
+    col1, col2, col3, col4 = st.columns(4)
+
+    col1.metric(
+        "Total Assessments",
+        total
+    )
+
+    col2.metric(
+        "High Risk",
+        high
+    )
+
+    col3.metric(
+        "Medium Risk",
+        medium
+    )
+
+    col4.metric(
+        "Low Risk",
+        low
+    )
+
+    st.subheader("Recent Assessments")
+
+    for record in records:
+
+        st.write(
+            f"👤 {record[1]}"
+        )
+
+        st.write(
+            f"⚠ Risk: {record[7]}"
+        )
+
+        st.write(
+            f"🩺 Symptoms: {record[2]}"
+        )
+
+        st.write("---")

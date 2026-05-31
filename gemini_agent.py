@@ -15,6 +15,8 @@ model = genai.GenerativeModel(
 
 def analyze_patient(
     symptoms,
+    recovery_status,
+    recovery_score,
     medication_taken,
     fever,
     pain_level,
@@ -42,6 +44,9 @@ def analyze_patient(
 
     ## Recommended Action
     <short action>
+
+    Recovery Status: {recovery_status}
+    Recovery Score: {recovery_score}/10
 
     Keep the entire response under 80 words.
     """

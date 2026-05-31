@@ -103,3 +103,34 @@ def add_followup(
 
     conn.commit()
     conn.close()
+def get_followups():
+
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    SELECT * FROM followups
+    ORDER BY id DESC
+    """)
+
+    data = cursor.fetchall()
+
+    conn.close()
+
+    return data
+
+def get_patient_by_name(name):
+
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "SELECT * FROM patients WHERE name = ?",
+        (name,)
+    )
+
+    patient = cursor.fetchone()
+
+    conn.close()
+
+    return patient

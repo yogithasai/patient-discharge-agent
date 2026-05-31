@@ -35,6 +35,9 @@ if menu == "Register Patient":
         min_value=1,
         max_value=120
     )
+    phone = st.text_input(
+        "Phone Number"
+    )
 
     condition = st.text_input(
         "Medical Condition"
@@ -57,10 +60,11 @@ if menu == "Register Patient":
         add_patient(
             name,
             age,
+            phone,
             condition,
-            str(discharge_date),
+            discharge_date,
             medications,
-            str(followup_date)
+            followup_date
         )
 
         st.success(

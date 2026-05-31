@@ -21,7 +21,9 @@ def analyze_patient(
 ):
 
     prompt = f"""
-    Analyze this discharged patient's condition.
+    You are a healthcare follow-up assistant.
+
+    Analyze the patient's condition.
 
     Symptoms: {symptoms}
     Medication Taken: {medication_taken}
@@ -29,13 +31,11 @@ def analyze_patient(
     Pain Level: {pain_level}
     Breathing Difficulty: {breathing_issue}
 
-    Return:
+    Return ONLY:
 
     Risk Level:
-    Reason:
-    Recommended Action:
+    Reason: (max 2 lines)
+    Recommended Action: (max 2 lines)
+
+    Keep the entire response under 100 words.
     """
-
-    response = model.generate_content(prompt)
-
-    return response.text

@@ -1,3 +1,4 @@
+from gemini_agent import analyze_patient
 import streamlit as st
 
 from database import (
@@ -134,3 +135,17 @@ elif menu == "Patient Follow-Up":
             st.error(
                 "⚠ Immediate Doctor Attention Required"
             )
+
+        with st.spinner("AI analyzing patient condition..."):
+
+            ai_result = analyze_patient(
+                symptoms,
+                medication_taken,
+                fever,
+                pain_level,
+                breathing_issue
+            )
+
+        st.subheader("🤖 AI Medical Assessment")
+
+        st.write(ai_result)

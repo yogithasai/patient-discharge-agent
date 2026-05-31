@@ -64,3 +64,42 @@ def get_patients():
 
     conn.close()
     return data
+
+def add_followup(
+    patient_name,
+    symptoms,
+    medication_taken,
+    fever,
+    pain_level,
+    breathing_issue,
+    risk_level
+):
+
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    INSERT INTO followups
+    (
+        patient_name,
+        symptoms,
+        medication_taken,
+        fever,
+        pain_level,
+        breathing_issue,
+        risk_level
+    )
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+    """,
+    (
+        patient_name,
+        symptoms,
+        medication_taken,
+        fever,
+        pain_level,
+        breathing_issue,
+        risk_level
+    ))
+
+    conn.commit()
+    conn.close()

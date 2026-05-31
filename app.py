@@ -95,7 +95,11 @@ elif menu == "View Patients":
         )
 
         st.write(
-            f"Condition: {patient[3]}"
+            f"Phone: {patient[3]}"
+        )
+
+        st.write(
+            f"Condition: {patient[4]}"
         )
 
         st.write("---")

@@ -1,6 +1,12 @@
 from gemini_agent import analyze_patient
 import streamlit as st
 
+st.set_page_config(
+    page_title="Patient Post-Discharge AI Agent",
+    page_icon="🏥",
+    layout="wide"
+)
+
 from notifications import (
     send_whatsapp,
     send_staff_alert
@@ -21,24 +27,59 @@ from database import (
     get_patient_by_name
 )
 
+st.markdown("""
+    <style>
+
+    .main {
+        padding-top: 1rem;
+    }
+
+    .stButton > button {
+        width: 100%;
+        border-radius: 12px;
+        height: 3em;
+        font-weight: bold;
+    }
+
+    div[data-testid="metric-container"] {
+        border: 1px solid #e6e6e6;
+        padding: 15px;
+        border-radius: 12px;
+        box-shadow: 0px 2px 8px rgba(0,0,0,0.08);
+    }
+
+    </style>
+    """, unsafe_allow_html=True)
+
 init_db()
 
-st.title("🏥 Patient Post-Discharge AI Agent")
+st.markdown("""
+    # 🏥 Patient Post-Discharge AI Agent
+    ### AI-Powered Recovery Monitoring & Healthcare Outreach
+    """)
+
+st.sidebar.title("🏥 Healthcare AI")
+st.sidebar.caption("Patient Post-Discharge Monitoring System")
+st.sidebar.markdown("---")
 
 menu = st.sidebar.selectbox(
-    "Menu",
+    "Navigation",
     [
-        "Register Patient",
-        "Patient Follow-Up",
-        "Patient Outreach",
-        "Staff Alerts",
-        "View Patients",
-        "Dashboard"
+        "📊 Dashboard",
+        "👤 Register Patient",
+        "🩺 Patient Follow-Up",
+        "📩 Patient Outreach",
+        "🚨 Staff Alerts",
+        "📋 View Patients"
     ]
 )
 
-if menu == "Register Patient":
+st.sidebar.markdown("---")
+st.sidebar.info(
+    "AI-powered patient recovery monitoring and healthcare outreach."
+)
 
+if menu == "👤 Register Patient":
     st.header("Patient Registration")
 
     name = st.text_input("Patient Name")
@@ -83,7 +124,7 @@ if menu == "Register Patient":
             "Patient Registered Successfully!"
         )
 
-elif menu == "View Patients":
+elif menu == "👤 Register Patient":
 
     st.header("Patient Records")
 
@@ -109,7 +150,7 @@ elif menu == "View Patients":
 
         st.write("---")
 
-elif menu == "Patient Follow-Up":
+elif menu == "🩺 Patient Follow-Up":
 
     st.header("Patient Follow-Up Assessment")
 
@@ -229,7 +270,7 @@ elif menu == "Patient Follow-Up":
 
             st.markdown(ai_result)
 
-elif menu == "Dashboard":
+elif menu == "📊 Dashboard":
 
     st.header("📊 Healthcare Dashboard")
 
@@ -289,7 +330,7 @@ elif menu == "Dashboard":
 
         st.write("---")
 
-elif menu == "Staff Alerts":
+elif menu == "🚨 Staff Alerts":
 
     st.header("🚨 Healthcare Staff Alerts")
 
@@ -320,8 +361,7 @@ elif menu == "Staff Alerts":
         """
                     )
 
-elif menu == "Patient Outreach":
-
+elif menu == "📩 Patient Outreach":
     st.header("📩 Patient Outreach Agent")
 
     patient_names = get_patient_names()

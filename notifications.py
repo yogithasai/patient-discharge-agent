@@ -23,3 +23,30 @@ def send_whatsapp(phone, message):
     )
 
     return twilio_message.sid
+
+def send_staff_alert(
+    patient_name,
+    symptoms,
+    risk_level
+):
+
+    alert_message = f"""
+    🚨 HIGH RISK PATIENT ALERT
+
+    Patient: {patient_name}
+
+    Risk Level: {risk_level}
+
+    Symptoms:
+    {symptoms}
+
+    Immediate review recommended.
+    """
+
+    message = client.messages.create(
+        body=alert_message[:1500],
+        from_=os.getenv("TWILIO_WHATSAPP_NUMBER"),
+        to=f"whatsapp:{os.getenv('DOCTOR_WHATSAPP')}"
+    )
+
+    return message.sid

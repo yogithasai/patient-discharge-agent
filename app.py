@@ -1,6 +1,8 @@
 from gemini_agent import analyze_patient
 import streamlit as st
 
+from notifications import send_whatsapp
+
 from gemini_agent import (
     analyze_patient,
     generate_followup_message
@@ -338,22 +340,19 @@ elif menu == "Patient Outreach":
         ):
 
             prompt = f"""
-            Create a healthcare follow-up message.
+            Generate a WhatsApp message under 500 characters.
 
-            Patient Name:
-            {patient[1]}
+            Patient: {patient[1]}
+            Medication: {patient[6]}
+            Follow-up Date: {patient[7]}
 
-            Medication:
-            {patient[6]}
+            Include:
+            - Medication reminder
+            - Follow-up reminder
+            - Ask recovery status
+            - Ask about fever, pain, breathing issues
 
-            Follow-Up Date:
-            {patient[7]}
-
-            Ask:
-            - Recovery status
-            - Fever
-            - Pain
-            - Breathing issues
+            Keep it friendly and concise.
             """
 
             message = generate_followup_message(
@@ -367,3 +366,16 @@ elif menu == "Patient Outreach":
             )
 
             st.write(message)
+
+            sid = send_whatsapp(
+                patient[3],
+                message
+            )
+
+            st.success(
+                f"✅ WhatsApp Sent Successfully!"
+            )
+
+            st.write(
+                f"Message SID: {sid}"
+            )

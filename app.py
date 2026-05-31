@@ -132,23 +132,17 @@ elif menu == "📋 View Patients":
 
     for patient in patients:
 
-        st.write(
-            f"ID: {patient[0]}"
-        )
+            st.markdown(f"""
+        ### 👤 {patient[1]}
 
-        st.write(
-            f"Name: {patient[1]}"
-        )
+        📞 **Phone:** {patient[3]}
 
-        st.write(
-            f"Phone: {patient[3]}"
-        )
+        🏥 **Condition:** {patient[4]}
 
-        st.write(
-            f"Condition: {patient[4]}"
-        )
+        📅 **Follow-Up Date:** {patient[7]}
+        """)
 
-        st.write("---")
+            st.divider()
 
 elif menu == "🩺 Patient Follow-Up":
 
@@ -214,6 +208,13 @@ elif menu == "🩺 Patient Follow-Up":
     )
 
     if st.button("Assess Risk"):
+        patient = get_patient_by_name(patient_name)
+
+        if not patient:
+            st.error(
+                "❌ Patient not found. Please register the patient first."
+            )
+            st.stop()
 
         from risk_assessment import assess_risk
 
@@ -275,6 +276,9 @@ elif menu == "📊 Dashboard":
     st.header("📊 Healthcare Dashboard")
 
     records = get_followups()
+    patients = get_patients()
+
+    total_patients = len(patients)
 
     total = len(records)
 
@@ -293,23 +297,41 @@ elif menu == "📊 Dashboard":
     col1, col2, col3, col4 = st.columns(4)
 
     col1.metric(
-        "Total Assessments",
-        total
+    "👥 Patients",
+    total_patients
     )
 
     col2.metric(
-        "High Risk",
-        high
-    )
+    "🚨 High Risk",
+    high
+    )   
 
     col3.metric(
-        "Medium Risk",
-        medium
+    "⚠ Medium Risk",
+    medium
     )
 
     col4.metric(
-        "Low Risk",
-        low
+    "✅ Low Risk",
+    low
+    )
+
+    st.markdown("---")
+
+    st.subheader("🏥 System Overview")
+
+    st.info(
+        f"""
+    Total Registered Patients: {total_patients}
+
+    Total Follow-Up Assessments: {total}
+
+    High Risk Cases: {high}
+
+    WhatsApp Outreach Enabled: ✅
+
+    Healthcare Staff Alerts Enabled: ✅
+    """
     )
 
     st.subheader("Recent Assessments")
@@ -366,6 +388,7 @@ elif menu == "📩 Patient Outreach":
 
     patient_names = get_patient_names()
 
+    
     selected_patient = st.selectbox(
         "Select Patient",
         patient_names

@@ -19,6 +19,7 @@ menu = st.sidebar.selectbox(
     [
         "Register Patient",
         "Patient Follow-Up",
+        "Staff Alerts",
         "View Patients",
         "Dashboard"
     ]
@@ -256,3 +257,34 @@ elif menu == "Dashboard":
         )
 
         st.write("---")
+
+elif menu == "Staff Alerts":
+
+    st.header("🚨 Healthcare Staff Alerts")
+
+    records = get_followups()
+
+    high_risk = [
+        r for r in records
+        if r[7] == "High"
+    ]
+
+    if not high_risk:
+
+        st.success(
+            "No active high-risk alerts."
+        )
+
+    else:
+
+        for record in high_risk:
+
+            st.error(
+                f"""
+Patient: {record[1]}
+
+Risk Level: {record[7]}
+
+Symptoms: {record[2]}
+"""
+            )

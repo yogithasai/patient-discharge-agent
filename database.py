@@ -35,23 +35,33 @@ def init_db():
     conn.commit()
     conn.close()
 
-
-def add_patient(name, age, condition, discharge_date,
-                medications, followup_date):
+def add_patient(name, age, phone,
+                condition,
+                discharge_date,
+                medications,
+                followup_date):
 
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
 
     cursor.execute("""
-    INSERT INTO patients
-    (name, age, condition, discharge_date,
-     medications, followup_date)
-    VALUES (?, ?, ?, ?, ?, ?)
-    """,
-    (name, age, condition,
-     discharge_date, medications,
-     followup_date))
-
+        INSERT INTO patients
+        (name, age, phone,
+        condition,
+        discharge_date,
+        medications,
+        followup_date)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+        """,
+        (
+            name,
+            age,
+            phone,
+            condition,
+            discharge_date,
+            medications,
+            followup_date
+        ))
     conn.commit()
     conn.close()
 
@@ -135,3 +145,18 @@ def get_patient_by_name(name):
     conn.close()
 
     return patient
+
+def get_patient_names():
+
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "SELECT name FROM patients"
+    )
+
+    names = cursor.fetchall()
+
+    conn.close()
+
+    return [n[0] for n in names]

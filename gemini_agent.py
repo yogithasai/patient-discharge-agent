@@ -54,3 +54,32 @@ def analyze_patient(
     response = model.generate_content(prompt)
     return response.text
 
+def generate_followup_message(
+    patient_name,
+    medications,
+    followup_date
+):
+
+    prompt = f"""
+    Create a professional healthcare follow-up message.
+
+    Patient Name: {patient_name}
+
+    Medications:
+    {medications}
+
+    Follow-Up Date:
+    {followup_date}
+
+    The message should:
+    - Remind medications
+    - Remind appointment
+    - Ask about recovery progress
+    - Ask about fever, pain and breathing issues
+    """
+
+    response = model.generate_content(
+        prompt
+    )
+
+    return response.text

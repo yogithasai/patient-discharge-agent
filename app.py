@@ -1,12 +1,18 @@
 from gemini_agent import analyze_patient
 import streamlit as st
 
+from gemini_agent import (
+    analyze_patient,
+    generate_followup_message
+)
+
 from database import (
     init_db,
     add_patient,
     get_patients,
     add_followup,
     get_followups,
+    get_patient_names,
     get_patient_by_name
 )
 
@@ -19,6 +25,7 @@ menu = st.sidebar.selectbox(
     [
         "Register Patient",
         "Patient Follow-Up",
+        "Patient Outreach",
         "Staff Alerts",
         "View Patients",
         "Dashboard"
@@ -292,3 +299,67 @@ Risk Level: {record[7]}
 Symptoms: {record[2]}
 """
             )
+
+elif menu == "Patient Outreach":
+
+    st.header("📩 Patient Outreach Agent")
+
+    patient_names = get_patient_names()
+
+    selected_patient = st.selectbox(
+        "Select Patient",
+        patient_names
+    )
+
+    patient = get_patient_by_name(
+        selected_patient
+    )
+
+    if patient:
+
+        st.info(
+            f"📞 Phone: {patient[3]}"
+        )
+
+        st.info(
+            f"💊 Medication: {patient[6]}"
+        )
+
+        st.info(
+            f"📅 Follow-Up: {patient[7]}"
+        )
+
+        if st.button(
+            "Generate Follow-Up Message"
+        ):
+
+            prompt = f"""
+            Create a healthcare follow-up message.
+
+            Patient Name:
+            {patient[1]}
+
+            Medication:
+            {patient[6]}
+
+            Follow-Up Date:
+            {patient[7]}
+
+            Ask:
+            - Recovery status
+            - Fever
+            - Pain
+            - Breathing issues
+            """
+
+            message = generate_followup_message(
+                    patient[1],
+                    patient[6],
+                    patient[7]
+                )
+
+            st.subheader(
+                "Generated Message"
+            )
+
+            st.write(message)

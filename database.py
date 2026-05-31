@@ -11,6 +11,7 @@ def init_db():
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT,
         age INTEGER,
+        phone TEXT,
         condition TEXT,
         discharge_date TEXT,
         medications TEXT,

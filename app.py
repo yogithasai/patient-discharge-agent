@@ -124,9 +124,9 @@ if menu == "👤 Register Patient":
             "Patient Registered Successfully!"
         )
 
-elif menu == "👤 Register Patient":
+elif menu == "📋 View Patients":
 
-    st.header("Patient Records")
+    st.header("📋Patient Records")
 
     patients = get_patients()
 

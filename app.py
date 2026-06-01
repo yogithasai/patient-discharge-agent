@@ -497,7 +497,7 @@ elif menu == "📅 Reminder Center":
 
             sent += 1
 
-        st.success(
+    st.success(
             f"✅ Appointment reminders sent to {sent} patients."
         )
 

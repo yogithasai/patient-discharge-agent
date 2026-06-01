@@ -470,7 +470,7 @@ elif menu == "📅 Reminder Center":
             f"✅ Medication reminders sent to {sent} patients."
         )
 
-        if st.button("📅 Send Appointment Reminders"):
+    if st.button("📅 Send Appointment Reminders"):
 
             sent = 0
 

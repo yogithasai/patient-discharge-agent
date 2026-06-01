@@ -66,10 +66,11 @@ st.sidebar.markdown("---")
 menu = st.sidebar.selectbox(
     "Navigation",
     [
-        "📊 Dashboard",
+         "📊 Dashboard",
         "👤 Register Patient",
         "🩺 Patient Follow-Up",
         "📩 Patient Outreach",
+        "📅 Reminder Center",
         "🚨 Staff Alerts",
         "📋 View Patients"
     ]
@@ -152,6 +153,10 @@ elif menu == "📋 View Patients":
     st.header("📋Patient Records")
 
     patients = get_patients()
+    st.metric(
+    "👥 Registered Patients",
+    len(patients)
+)
 
     for patient in patients:
 
@@ -415,6 +420,86 @@ elif menu == "📊 Dashboard":
         )
 
         st.write("---")
+
+elif menu == "📅 Reminder Center":
+
+    st.header("📅 Reminder Center")
+
+    patients = get_patients()
+
+    st.metric(
+        "Patients Eligible For Reminders",
+        len(patients)
+    )
+
+    st.markdown("---")
+
+    if st.button(
+        "💊 Send Medication Reminders"
+    ):
+
+        sent = 0
+
+        for patient in patients:
+
+            reminder = f"""
+    Hello {patient[1]},
+
+    💊 Medication Reminder
+
+    Please remember to take:
+
+    {patient[6]}
+
+    Reply if you are experiencing:
+    • Fever
+    • Pain
+    • Breathing difficulty
+
+    Stay healthy.
+    """
+
+            send_whatsapp(
+                patient[3],
+                reminder
+            )
+
+            sent += 1
+
+        st.success(
+            f"✅ Medication reminders sent to {sent} patients."
+        )
+
+        if st.button("📅 Send Appointment Reminders"):
+
+            sent = 0
+
+            for patient in patients:
+
+                reminder = f"""
+    Hello {patient[1]},
+
+    📅 Appointment Reminder
+
+    Your follow-up appointment is scheduled for:
+
+    {patient[7]}
+
+    Please contact the hospital if you need to reschedule.
+
+    Thank you.
+    """
+
+            send_whatsapp(
+                patient[3],
+                reminder
+            )
+
+            sent += 1
+
+        st.success(
+            f"✅ Appointment reminders sent to {sent} patients."
+        )
 
 elif menu == "🚨 Staff Alerts":
 

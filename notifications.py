@@ -24,6 +24,18 @@ def send_whatsapp(phone, message):
 
     return twilio_message.sid
 
+import os
+
+def send_doctor_alert(message):
+
+    return send_whatsapp(
+        os.getenv("DOCTOR_WHATSAPP").replace(
+            "whatsapp:",
+            ""
+        ),
+        message
+    )
+
 def send_staff_alert(
     patient_name,
     symptoms,
@@ -50,3 +62,12 @@ def send_staff_alert(
     )
 
     return message.sid
+
+def send_doctor_alert(message):
+
+    return send_whatsapp(
+        os.getenv("DOCTOR_WHATSAPP").replace(
+            "whatsapp:", ""
+        ),
+        message
+    )

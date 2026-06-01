@@ -1,6 +1,5 @@
 from gemini_agent import analyze_patient
 import streamlit as st
-import plotly.express as px
 
 st.set_page_config(
     page_title="Patient Post-Discharge AI Agent",
@@ -289,6 +288,27 @@ elif menu == "🩺 Patient Follow-Up":
         st.success(
             f"Risk Level: {risk}"
         )
+        if risk == "High":
+
+            from notifications import send_doctor_alert
+
+            alert_message = f"""
+        🚨 HIGH RISK PATIENT ALERT
+
+        Patient: {patient_name}
+
+        Symptoms: {symptoms}
+
+        Fever: {fever}
+        Pain: {pain_level}
+        Breathing Issue: {breathing_issue}
+
+        Immediate review recommended.
+        """
+
+            send_doctor_alert(
+                alert_message
+            )
 
         if "high" in risk.lower() or "critical" in risk.lower():
 
@@ -385,24 +405,6 @@ elif menu == "📊 Dashboard":
     """
     )
 
-    st.subheader("📈 Risk Distribution")
-
-    chart_data = {
-        "Risk": ["High", "Medium", "Low"],
-        "Count": [high, medium, low]
-    }
-
-    fig = px.pie(
-        values=chart_data["Count"],
-        names=chart_data["Risk"],
-        title="Patient Risk Distribution"
-    )
-
-    st.plotly_chart(
-        fig,
-        use_container_width=True
-    )
-
     st.subheader("Recent Assessments")
 
     for record in records:
@@ -470,25 +472,27 @@ elif menu == "📅 Reminder Center":
             f"✅ Medication reminders sent to {sent} patients."
         )
 
-    if st.button("📅 Send Appointment Reminders"):
+    if st.button(
+        "📅 Send Appointment Reminders"
+    ):
 
-            sent = 0
+        sent = 0
 
-            for patient in patients:
+        for patient in patients:
 
-                reminder = f"""
-    Hello {patient[1]},
+            reminder = f"""
+Hello {patient[1]},
 
-    📅 Appointment Reminder
+📅 Appointment Reminder
 
-    Your follow-up appointment is scheduled for:
+Your follow-up appointment is scheduled for:
 
-    {patient[7]}
+{patient[7]}
 
-    Please contact the hospital if you need to reschedule.
+Please contact the hospital if you need to reschedule.
 
-    Thank you.
-    """
+Thank you.
+"""
 
             send_whatsapp(
                 patient[3],
@@ -497,7 +501,7 @@ elif menu == "📅 Reminder Center":
 
             sent += 1
 
-    st.success(
+        st.success(
             f"✅ Appointment reminders sent to {sent} patients."
         )
 

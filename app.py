@@ -76,6 +76,28 @@ menu = st.sidebar.selectbox(
 )
 
 st.sidebar.markdown("---")
+patients = get_patients()
+
+count = len(patients)
+
+st.sidebar.warning(
+    f"🔔 {count} Patients Pending Follow-Up"
+)
+
+with st.sidebar.expander(
+    "View Follow-Up Queue"
+):
+
+    for p in patients:
+
+        st.write(
+            f"👤 {p[1]}"
+        )
+
+        st.caption(
+            f"📅 {p[7]}"
+        )
+
 st.sidebar.info(
     "AI-powered patient recovery monitoring and healthcare outreach."
 )
@@ -133,15 +155,33 @@ elif menu == "📋 View Patients":
 
     for patient in patients:
 
-            st.markdown(f"""
-        ### 👤 {patient[1]}
+        with st.container():
 
-        📞 **Phone:** {patient[3]}
+            st.markdown(
+                f"### 👤 {patient[1]}"
+            )
 
-        🏥 **Condition:** {patient[4]}
+            col1, col2 = st.columns(2)
 
-        📅 **Follow-Up Date:** {patient[7]}
-        """)
+            with col1:
+
+                st.info(
+                    f"📞 Phone\n\n{patient[3]}"
+                )
+
+                st.info(
+                    f"🏥 Condition\n\n{patient[4]}"
+                )
+
+            with col2:
+
+                st.info(
+                    f"💊 Medication\n\n{patient[6]}"
+                )
+
+                st.info(
+                    f"📅 Follow-Up\n\n{patient[7]}"
+                )
 
             st.divider()
 
@@ -149,10 +189,14 @@ elif menu == "🩺 Patient Follow-Up":
 
     st.header("Patient Follow-Up Assessment")
 
-    patient_name = st.text_input(
-        "Patient Name"
+    patient_names = get_patient_names()
+
+    patient_name = st.selectbox(
+        "Select Patient",
+        patient_names
     )
     
+
     if patient_name:
 
         patient = get_patient_by_name(
@@ -162,12 +206,13 @@ elif menu == "🩺 Patient Follow-Up":
         if patient:
 
             st.info(
-                f"💊 Medication Reminder: {patient[5]}"
+                f"💊 Medication Reminder: {patient[6]}"
             )
 
             st.info(
-                f"📅 Next Follow-Up Appointment: {patient[6]}"
+                f"📅 Next Follow-Up Appointment: {patient[7]}"
             )
+    
 
     symptoms = st.text_area(
         "Describe Symptoms"
@@ -334,7 +379,7 @@ elif menu == "📊 Dashboard":
     Healthcare Staff Alerts Enabled: ✅
     """
     )
-    
+
     st.subheader("📈 Risk Distribution")
 
     chart_data = {
@@ -373,7 +418,7 @@ elif menu == "📊 Dashboard":
 
 elif menu == "🚨 Staff Alerts":
 
-    st.header("🚨 Healthcare Staff Alerts")
+    st.header("🚨 Healthcare Alert Center")
 
     records = get_followups()
 
@@ -382,25 +427,48 @@ elif menu == "🚨 Staff Alerts":
         if r[7] == "High"
     ]
 
+    st.metric(
+        "Active High-Risk Alerts",
+        len(high_risk)
+    )
+
+    st.markdown("---")
+
     if not high_risk:
 
         st.success(
-            "No active high-risk alerts."
+            "✅ No active high-risk patients."
         )
 
     else:
 
         for record in high_risk:
 
-            st.error(
-                        f"""
-        Patient: {record[1]}
+            with st.container():
 
-        Risk Level: {record[7]}
+                st.error(
+                    f"🚨 HIGH RISK PATIENT: {record[1]}"
+                )
 
-        Symptoms: {record[2]}
-        """
+                col1, col2 = st.columns(2)
+
+                with col1:
+
+                    st.write(
+                        f"🩺 Symptoms: {record[2]}"
                     )
+
+                with col2:
+
+                    st.write(
+                        f"⚠ Risk Level: {record[7]}"
+                    )
+
+                st.warning(
+                    "Immediate healthcare staff review recommended."
+                )
+
+                st.divider()
 
 elif menu == "📩 Patient Outreach":
     st.header("📩 Patient Outreach Agent")

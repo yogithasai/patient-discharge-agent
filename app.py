@@ -334,6 +334,24 @@ elif menu == "📊 Dashboard":
     Healthcare Staff Alerts Enabled: ✅
     """
     )
+    
+    st.subheader("📈 Risk Distribution")
+
+    chart_data = {
+        "Risk": ["High", "Medium", "Low"],
+        "Count": [high, medium, low]
+    }
+
+    fig = px.pie(
+        values=chart_data["Count"],
+        names=chart_data["Risk"],
+        title="Patient Risk Distribution"
+    )
+
+    st.plotly_chart(
+        fig,
+        use_container_width=True
+    )
 
     st.subheader("Recent Assessments")
 

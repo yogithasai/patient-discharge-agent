@@ -13,22 +13,57 @@ for patient in patients:
     medications = patient[6]
     followup_date = str(patient[7])
 
+    # Recovery Check-In Message
+
+    checkin_msg = f"""
+Hello {name},
+
+🩺 Recovery Check-In
+
+How are you feeling today?
+
+Please submit your latest recovery status through the Patient Portal.
+
+Please report:
+
+• Current symptoms
+• Fever status
+• Medication adherence
+• Any pain or breathing difficulties
+
+This helps our healthcare team monitor your recovery and provide timely support.
+
+Stay healthy.
+"""
+
+    send_whatsapp(
+        phone,
+        checkin_msg
+    )
+
     # Medication Reminder
+
     medication_msg = f"""
 Hello {name},
 
 💊 Daily Medication Reminder
 
-Please take:
+Please remember to take:
 
 {medications}
+
+Continue following your prescribed treatment plan.
 
 Stay healthy.
 """
 
-    send_whatsapp(phone, medication_msg)
+    send_whatsapp(
+        phone,
+        medication_msg
+    )
 
-    # Appointment Reminder
+    # Appointment Reminder Only On Follow-Up Date
+
     if followup_date == today:
 
         appointment_msg = f"""
@@ -36,11 +71,16 @@ Hello {name},
 
 📅 Follow-Up Appointment Reminder
 
-Your follow-up appointment is today.
+Your follow-up appointment is scheduled for today.
 
-Please submit your recovery report through the Patient Portal.
+Please submit your recovery report through the Patient Portal before your appointment.
+
+Thank you.
 """
 
-        send_whatsapp(phone, appointment_msg)
+        send_whatsapp(
+            phone,
+            appointment_msg
+        )
 
-print("Agent execution completed")
+print("Healthcare Follow-Up Agent execution completed")

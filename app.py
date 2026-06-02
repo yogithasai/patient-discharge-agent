@@ -27,7 +27,8 @@ from database import (
     get_patient_by_name,
     add_patient_report,
     get_patient_reports,
-    delete_patient
+    delete_patient,
+    get_latest_followup
 )
 
 st.markdown("""
@@ -693,7 +694,6 @@ elif menu == "📅 Reminder Center":
 """
                 )
 
-    st.markdown("---")
 
     if st.button(
         "💊 Send Medication Reminders"
@@ -763,7 +763,8 @@ Thank you.
         st.success(
             f"✅ Appointment reminders sent to {sent} patients."
         )
-        
+    st.markdown("---")
+
 elif menu == "🚨 Staff Alerts":
 
     st.header("🚨 Healthcare Alert Center")
@@ -823,25 +824,29 @@ elif menu == "🚨 Staff Alerts":
                 st.divider()
 
 elif menu == "📩 Patient Outreach":
+
     st.header("📩 Patient Outreach Agent")
 
     patient_names = get_patient_names()
 
     if not patient_names:
 
-            st.warning(
-                "No registered patients found."
-            )
+        st.warning(
+            "No registered patients found."
+        )
 
-            st.stop()
+        st.stop()
 
     patient_name = st.selectbox(
-            "Select Patient",
-            patient_names
+        "Select Patient",
+        patient_names
+    )
 
-        )
-    
     patient = get_patient_by_name(
+        patient_name
+    )
+
+    latest_followup = get_latest_followup(
         patient_name
     )
 
@@ -859,37 +864,45 @@ elif menu == "📩 Patient Outreach":
             f"📅 Follow-Up: {patient[7]}"
         )
 
+        st.subheader(
+            "📋 Latest Patient Status"
+        )
+
+        if latest_followup:
+
+            st.warning(
+                f"""
+Risk Level: {latest_followup[7]}
+
+Status: {latest_followup[8]}
+
+Symptoms: {latest_followup[2]}
+"""
+            )
+
+        else:
+
+            st.info(
+                "No follow-up assessments available yet."
+            )
+
         if st.button(
             "Generate Follow-Up Message"
         ):
 
-            prompt = f"""
-            Generate a WhatsApp message under 500 characters.
-
-            Patient: {patient[1]}
-            Medication: {patient[6]}
-            Follow-up Date: {patient[7]}
-
-            Include:
-            - Medication reminder
-            - Follow-up reminder
-            - Ask recovery status
-            - Ask about fever, pain, breathing issues
-
-            Keep it friendly and concise.
-            """
-
             message = generate_followup_message(
-                    patient[1],
-                    patient[6],
-                    patient[7]
-                )
+                patient[1],
+                patient[6],
+                patient[7]
+            )
 
             st.subheader(
                 "Generated Message"
             )
 
-            st.write(message)
+            st.write(
+                message
+            )
 
             sid = send_whatsapp(
                 patient[3],
@@ -897,7 +910,7 @@ elif menu == "📩 Patient Outreach":
             )
 
             st.success(
-                f"✅ WhatsApp Sent Successfully!"
+                "✅ Personalized outreach sent successfully!"
             )
 
             st.write(

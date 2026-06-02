@@ -250,3 +250,25 @@ def delete_patient(name):
 
     conn.commit()
     conn.close()
+
+def get_latest_followup(patient_name):
+
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        SELECT *
+        FROM followups
+        WHERE patient_name = ?
+        ORDER BY id DESC
+        LIMIT 1
+        """,
+        (patient_name,)
+    )
+
+    data = cursor.fetchone()
+
+    conn.close()
+
+    return data

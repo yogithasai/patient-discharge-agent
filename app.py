@@ -108,76 +108,85 @@ st.sidebar.info(
 )
 
 if menu == "👤 Register Patient":
+
     st.header("Patient Registration")
 
-    name = st.text_input("Patient Name")
-    age = st.number_input(
-        "Age",
-        min_value=1,
-        max_value=120,
-        value=18
-    )
-    phone = st.text_input(
-        "Phone Number",
-        placeholder="9876543210"
-    )
+    with st.form("patient_form"):
 
-    condition = st.text_input(
-        "Medical Condition"
-    )
+        name = st.text_input("Patient Name")
 
-    discharge_date = st.date_input(
-        "Discharge Date"
-    )
+        age = st.number_input(
+            "Age",
+            min_value=1,
+            max_value=120,
+            value=18
+        )
 
-    medications = st.text_area(
-        "Medications"
-    )
+        phone = st.text_input(
+            "Phone Number",
+            placeholder="9876543210"
+        )
 
-    followup_date = st.date_input(
-        "Follow-up Date"
-    )
+        condition = st.text_input(
+            "Medical Condition"
+        )
 
-    if st.button("Save Patient"):
+        discharge_date = st.date_input(
+            "Discharge Date"
+        )
+
+        medications = st.text_area(
+            "Medications"
+        )
+
+        followup_date = st.date_input(
+            "Follow-up Date"
+        )
+
+        submitted = st.form_submit_button(
+            "Save Patient"
+        )
+
+    if submitted:
 
         if not name.strip():
 
             st.error(
-            "Patient name is required"
-        )
+                "Patient name is required"
+            )
 
-    elif len(phone) != 10 or not phone.isdigit():
+        elif len(phone) != 10 or not phone.isdigit():
 
-        st.error(
-            "Enter a valid 10-digit phone number"
-        )
+            st.error(
+                "Enter a valid 10-digit phone number"
+            )
 
-    elif followup_date < discharge_date:
+        elif followup_date < discharge_date:
 
-        st.error(
-            "Follow-up date cannot be before discharge date"
-        )
+            st.error(
+                "Follow-up date cannot be before discharge date"
+            )
 
-    else:
+        else:
 
-        formatted_phone = "+91" + phone
+            formatted_phone = "+91" + phone
 
-        add_patient(
-            name,
-            age,
-            phone,
-            condition,
-            discharge_date,
-            medications,
-            followup_date
-        )
+            add_patient(
+                name,
+                age,
+                formatted_phone,
+                condition,
+                discharge_date,
+                medications,
+                followup_date
+            )
 
-        st.success(
-        f"✅ {name} registered successfully"
-    )
+            st.success(
+                f"✅ {name} registered successfully"
+            )
 
-    st.rerun()
-
+            st.rerun()
+            
 elif menu == "📋 View Patients":
 
     st.header("📋Patient Records")

@@ -35,6 +35,8 @@ from database import (
     update_followup_status
 )
 
+init_db()
+
 st.markdown("""
     <style>
 

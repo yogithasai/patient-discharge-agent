@@ -59,7 +59,7 @@ init_db()
 
 st.markdown("""
     # 🏥 Patient Post-Discharge AI Agent
-    ### AI-Powered Recovery Monitoring & Healthcare Outreach
+    ### Automated Post-Discharge Monitoring, Risk Detection & Patient Recovery Management
     """)
 
 st.sidebar.title("🏥 Healthcare AI")
@@ -72,9 +72,9 @@ menu = st.sidebar.selectbox(
          "📊 Dashboard",
         "👤 Register Patient",
         "🩺 Patient Follow-Up",
-        "📩 Patient Outreach",
-        "📅 Reminder Center",
-        "🚨 Staff Alerts",
+        "🤖 Follow-Up Agent",
+        "💊 Care Reminders",
+        "🚨 Alert Center",
         "📋 View Patients",
         "📝 Patient Portal"
     ]
@@ -185,6 +185,33 @@ if menu == "👤 Register Patient":
             st.success(
                 f"✅ {name} registered successfully"
             )
+
+            welcome_message = f"""
+                    🏥 Welcome to the Patient Recovery Monitoring Program
+
+                    Hello {name},
+
+                    You have been successfully enrolled in our post-discharge follow-up program.
+
+                    You will receive:
+
+                    ✅ Medication reminders
+                    ✅ Appointment reminders
+                    ✅ Recovery check-ins
+
+                    If you experience fever, pain, or breathing difficulties, please report them immediately.
+
+                    Wishing you a smooth recovery.
+                    """
+
+            send_whatsapp(
+                        formatted_phone,
+                        welcome_message
+                    )
+
+            st.info(
+                        "📩 Patient onboarding message sent."
+                    )
 
 elif menu == "📋 View Patients":
 
@@ -662,7 +689,7 @@ elif menu == "📊 Dashboard":
         """
             )
 
-elif menu == "📅 Reminder Center":
+elif menu == "💊 Care Reminders":
 
     st.header("📅 Reminder Center")
 
@@ -718,21 +745,27 @@ elif menu == "📅 Reminder Center":
         for patient in patients:
 
             reminder = f"""
-Hello {patient[1]},
+        Hello {patient[1]},
 
-💊 Medication Reminder
+        💊 Medication Reminder
 
-Please remember to take:
+        Please remember to take:
 
-{patient[6]}
+        {patient[6]}
 
-Reply if you are experiencing:
-• Fever
-• Pain
-• Breathing difficulty
+        📝 Recovery Check-In
 
-Stay healthy.
-"""
+        Please submit your recovery status using the Patient Portal.
+
+        Report:
+        • Current symptoms
+        • Fever status
+        • Medication adherence
+
+        This helps our healthcare team monitor your recovery.
+
+        Stay healthy.
+        """
 
             send_whatsapp(
                 patient[3],
@@ -754,18 +787,20 @@ Stay healthy.
         for patient in patients:
 
             reminder = f"""
-Hello {patient[1]},
+        Hello {patient[1]},
 
-📅 Appointment Reminder
+        📅 Appointment Reminder
 
-Your follow-up appointment is scheduled for:
+        Your follow-up appointment is scheduled for:
 
-{patient[7]}
+        {patient[7]}
 
-Please contact the hospital if you need to reschedule.
+        📝 Before your appointment, please submit your latest recovery report through the Patient Portal.
 
-Thank you.
-"""
+        This helps our healthcare team review your condition in advance.
+
+        Thank you.
+        """
 
             send_whatsapp(
                 patient[3],
@@ -777,69 +812,78 @@ Thank you.
         st.success(
             f"✅ Appointment reminders sent to {sent} patients."
         )
-    st.markdown("---")
-
-elif menu == "🚨 Staff Alerts":
-
-    st.header("🚨 Healthcare Alert Center")
-
-    records = get_followups()
-
-    high_risk = [
-        r for r in records
-        if r[7] == "High"
-    ]
-
-    st.metric(
-        "Active High-Risk Alerts",
-        len(high_risk)
-    )
 
     st.markdown("---")
 
-    if not high_risk:
+elif menu == "🚨 Alert Center":
 
-        st.success(
-            "✅ No active high-risk patients."
-        )
+    st.header("🚨 High-Risk Patient Monitoring")
 
-    else:
+    for record in high_risk:
 
-        for record in high_risk:
+        with st.container():
 
-            with st.container():
+            st.error(
+                f"🚨 HIGH RISK PATIENT: {record[1]}"
+            )
 
-                st.error(
-                    f"🚨 HIGH RISK PATIENT: {record[1]}"
+            col1, col2 = st.columns(2)
+
+            with col1:
+                st.write(
+                    f"🩺 Symptoms: {record[2]}"
                 )
 
-                col1, col2 = st.columns(2)
-
-                with col1:
-
-                    st.write(
-                        f"🩺 Symptoms: {record[2]}"
-                    )
-
-                with col2:
-
-                    st.write(
-                        f"⚠ Risk Level: {record[7]}"
-                    )
-
-                    st.write(
-                        f"📌 Status: {record[8]}"
-                    )
-
-                st.warning(
-                    "Immediate healthcare staff review recommended."
+            with col2:
+                st.write(
+                    f"⚠ Risk Level: {record[7]}"
                 )
 
-                st.divider()
+                st.write(
+                    f"📌 Status: {record[8]}"
+                )
 
-elif menu == "📩 Patient Outreach":
+            st.warning(
+                "Immediate healthcare staff review recommended."
+            )
 
-    st.header("📩 Patient Outreach Agent")
+            action1, action2 = st.columns(2)
+
+            with action1:
+
+                if st.button(
+                    f"📩 Notify Doctor - {record[0]}"
+                ):
+
+                    send_doctor_alert(
+                        f"""
+HIGH RISK PATIENT
+
+Patient: {record[1]}
+Symptoms: {record[2]}
+Risk: {record[7]}
+"""
+                    )
+
+                    st.success(
+                        "Doctor notification sent."
+                    )
+
+            with action2:
+
+                if st.button(
+                    f"📞 Call Patient - {record[0]}"
+                ):
+
+                    st.info(
+                        "Voice call workflow initiated."
+                    )
+
+            st.divider()
+
+elif menu == "🤖 Follow-Up Agent":
+
+    st.header("🤖 Follow-Up Agent")
 
     patient_names = get_patient_names()
 

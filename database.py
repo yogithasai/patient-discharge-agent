@@ -248,6 +248,16 @@ def delete_patient(name):
         (name,)
     )
 
+    cursor.execute(
+        "DELETE FROM followups WHERE patient_name = ?",
+        (name,)
+    )
+
+    cursor.execute(
+        "DELETE FROM patient_reports WHERE patient_name = ?",
+        (name,)
+    )
+
     conn.commit()
     conn.close()
 
@@ -272,3 +282,15 @@ def get_latest_followup(patient_name):
     conn.close()
 
     return data
+
+def clear_all_data():
+
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+
+    cursor.execute("DELETE FROM patients")
+    cursor.execute("DELETE FROM followups")
+    cursor.execute("DELETE FROM patient_reports")
+
+    conn.commit()
+    conn.close()

@@ -17,14 +17,17 @@ from gemini_agent import (
     generate_followup_message
 )
 
-from database import (
+from database_supabase import (
     init_db,
     add_patient,
     get_patients,
+    get_patient_names,
+    get_patient_by_name
+)
+
+from database import (
     add_followup,
     get_followups,
-    get_patient_names,
-    get_patient_by_name,
     add_patient_report,
     get_patient_reports,
     delete_patient,

@@ -1,4 +1,4 @@
-from database import get_patients
+from database_sqlite_backup import get_patients
 from notifications import send_whatsapp
 from datetime import date
 

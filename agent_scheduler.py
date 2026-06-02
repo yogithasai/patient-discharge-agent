@@ -4,10 +4,6 @@ from datetime import date
 
 patients = get_patients()
 
-print("TOTAL PATIENTS:", len(patients))
-
-for p in patients:
-    print("PATIENT:", p)
 
 today = str(date.today())
 

@@ -218,7 +218,6 @@ elif menu == "📋 View Patients":
                     f"📅 Follow-Up\n\n{patient[7]}"
                 )
 
-            st.divider()
             if st.button(
                 f"🗑 Delete {patient[1]}",
                 key=f"delete_{patient[0]}"
@@ -231,6 +230,9 @@ elif menu == "📋 View Patients":
                 )
 
                 st.rerun()
+
+            st.divider()
+
 
 
 elif menu == "📝 Patient Portal":

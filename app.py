@@ -225,6 +225,13 @@ elif menu == "📋 View Patients":
                 st.info(
                     f"📅 Follow-Up\n\n{patient[7]}"
                 )
+            latest_followup = get_latest_followup(patient[1])
+
+            if latest_followup:
+
+                st.info(
+                    f"⚠ Latest Risk: {latest_followup[7]}"
+                )
 
             if st.button(
                 f"🗑 Delete {patient[1]}",
@@ -242,7 +249,6 @@ elif menu == "📋 View Patients":
             st.divider()
 
 
-
 elif menu == "📝 Patient Portal":
 
     st.header("📝 Patient Self-Report Portal")
@@ -254,22 +260,30 @@ elif menu == "📝 Patient Portal":
         patient_names
     )
 
-    
-    symptoms = st.text_area(
-        "Current Symptoms"
-    )
+    with st.form(
+    "patient_report_form",
+    clear_on_submit=True
+):
 
-    medication_taken = st.selectbox(
-        "Medication Taken?",
-        ["Yes", "No"]
-    )
+        symptoms = st.text_area(
+            "Current Symptoms"
+        )
 
-    fever = st.selectbox(
-        "Do you currently have fever?",
-        ["Yes", "No"]
-    )
+        medication_taken = st.selectbox(
+            "Medication Taken?",
+            ["Yes", "No"]
+        )
 
-    if st.button("Submit Self Report"):
+        fever = st.selectbox(
+            "Do you currently have fever?",
+            ["No", "Yes"]
+        )
+
+        submitted = st.form_submit_button(
+            "Submit Self Report"
+        )
+
+    if submitted:
 
         score = 0
 

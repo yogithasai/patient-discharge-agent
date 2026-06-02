@@ -26,7 +26,8 @@ from database import (
     get_patient_names,
     get_patient_by_name,
     add_patient_report,
-    get_patient_reports
+    get_patient_reports,
+    delete_patient
 )
 
 st.markdown("""
@@ -113,10 +114,12 @@ if menu == "👤 Register Patient":
     age = st.number_input(
         "Age",
         min_value=1,
-        max_value=120
+        max_value=120,
+        value=18
     )
     phone = st.text_input(
-        "Phone Number"
+        "Phone Number",
+        placeholder="9876543210"
     )
 
     condition = st.text_input(
@@ -137,6 +140,28 @@ if menu == "👤 Register Patient":
 
     if st.button("Save Patient"):
 
+        if not name.strip():
+
+            st.error(
+            "Patient name is required"
+        )
+
+    elif len(phone) != 10 or not phone.isdigit():
+
+        st.error(
+            "Enter a valid 10-digit phone number"
+        )
+
+    elif followup_date < discharge_date:
+
+        st.error(
+            "Follow-up date cannot be before discharge date"
+        )
+
+    else:
+
+        formatted_phone = "+91" + phone
+
         add_patient(
             name,
             age,
@@ -148,8 +173,10 @@ if menu == "👤 Register Patient":
         )
 
         st.success(
-            "Patient Registered Successfully!"
-        )
+        f"✅ {name} registered successfully"
+    )
+
+    st.rerun()
 
 elif menu == "📋 View Patients":
 
@@ -192,6 +219,106 @@ elif menu == "📋 View Patients":
                 )
 
             st.divider()
+            if st.button(
+                f"🗑 Delete {patient[1]}",
+                key=f"delete_{patient[0]}"
+            ):
+
+                delete_patient(patient[1])
+
+                st.success(
+                    f"✅ {patient[1]} deleted successfully"
+                )
+
+                st.rerun()
+
+
+elif menu == "📝 Patient Portal":
+
+    st.header("📝 Patient Self-Report Portal")
+
+    patient_names = get_patient_names()
+
+    selected_patient = st.selectbox(
+        "Select Patient",
+        patient_names
+    )
+
+    symptoms = st.text_area(
+        "Current Symptoms"
+    )
+
+    medication_taken = st.selectbox(
+        "Medication Taken?",
+        ["Yes", "No"]
+    )
+
+    fever = st.selectbox(
+        "Do you currently have fever?",
+        ["Yes", "No"]
+    )
+
+    if st.button("Submit Self Report"):
+
+        score = 0
+
+        if fever == "Yes":
+            score += 4
+
+        if medication_taken == "No":
+            score += 3
+
+        if len(symptoms) > 30:
+            score += 3
+
+        if score >= 7:
+            risk = "High"
+            status = "Escalated"
+
+        elif score >= 4:
+            risk = "Medium"
+            status = "Pending"
+
+        else:
+            risk = "Low"
+            status = "Reviewed"
+
+        add_patient_report(
+            selected_patient,
+            symptoms,
+            medication_taken,
+            fever,
+            risk,
+            status
+        )
+
+        if risk == "High":
+
+            send_whatsapp(
+                f"""
+        🚨 HIGH RISK PATIENT SELF REPORT
+
+        Patient: {selected_patient}
+
+        Symptoms: {symptoms}
+
+        Medication Taken: {medication_taken}
+
+        Fever: {fever}
+
+        Risk: {risk}
+
+        Immediate medical review required.
+        """
+            )
+
+        st.success(
+            f"Report Submitted Successfully | Risk: {risk}"
+        )
+
+        st.info(
+            f"Current Status: {status}"
+        )
 
 elif menu == "🩺 Patient Follow-Up":
 
@@ -353,6 +480,11 @@ elif menu == "📊 Dashboard":
     records = get_followups()
     patients = get_patients()
 
+    reports = get_patient_reports()
+
+    total_reports = len(reports)
+
+
     total_patients = len(patients)
 
     total = len(records)
@@ -383,7 +515,7 @@ elif menu == "📊 Dashboard":
 
     pending_followups = len(patients)
 
-    col1, col2, col3, col4 = st.columns(4)
+    col1, col2, col3, col4, col5 = st.columns(5)
 
     col1.metric(
     "👥 Patients",
@@ -404,6 +536,8 @@ elif menu == "📊 Dashboard":
     "✅ Low Risk",
     low
     )
+
+    col5.metric("📝 Reports", total_reports)
 
     st.markdown("---")
     st.subheader("📌 Case Status Overview")
@@ -472,6 +606,21 @@ elif menu == "📊 Dashboard":
             )
 
             st.divider()
+    st.subheader("📝 Recent Patient Self Reports")
+
+    reports = get_patient_reports()
+
+    for report in reports[:5]:
+
+        st.info(
+                f"""
+        Patient: {report[1]}
+
+        Risk: {report[5]}
+
+        Status: {report[6]}
+        """
+            )
 
 elif menu == "📅 Reminder Center":
 

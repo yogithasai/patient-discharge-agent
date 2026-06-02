@@ -237,3 +237,16 @@ def get_patient_reports():
     conn.close()
 
     return data
+
+def delete_patient(name):
+
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "DELETE FROM patients WHERE name = ?",
+        (name,)
+    )
+
+    conn.commit()
+    conn.close()

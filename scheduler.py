@@ -1,4 +1,4 @@
-from database_sqlite_backup import get_patients
+from database import get_patients
 from notifications import send_medication_reminder
 from notifications import send_appointment_reminder
 

@@ -207,6 +207,10 @@ if menu == "👤 Register Patient":
                     ✅ Recovery check-ins
 
                     If you experience fever, pain, or breathing difficulties, please report them immediately.
+                    https://patient-discharge-agent-wgx8uimu8ufcghxagsaiie.streamlit.app/
+                    
+                    After opening the app, select "🧑 Patient Portal" from the sidebar and submit your report.
+
 
                     Wishing you a smooth recovery.
                     """

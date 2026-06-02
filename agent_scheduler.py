@@ -24,6 +24,9 @@ Hello {name},
 How are you feeling today?
 
 Please submit your latest recovery status through the Patient Portal.
+https://patient-discharge-agent-wgx8uimu8ufcghxagsaiie.streamlit.app/
+
+After opening the app, select "🧑 Patient Portal" from the sidebar and submit your report.
 
 Please report:
 
@@ -75,6 +78,9 @@ Hello {name},
 Your follow-up appointment is scheduled for today.
 
 Please submit your recovery report through the Patient Portal before your appointment.
+https://patient-discharge-agent-wgx8uimu8ufcghxagsaiie.streamlit.app/
+
+After opening the app, select "🧑 Patient Portal" from the sidebar and submit your report.
 
 Thank you.
 """

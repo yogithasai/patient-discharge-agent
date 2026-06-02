@@ -81,6 +81,11 @@ def generate_followup_message(
     - Remind appointment
     - Ask about recovery progress
     - Ask about fever, pain and breathing issues
+
+    And also mention this
+    "Please report your recovery status through the Patient Portal before your appointment.
+    https://patient-discharge-agent-wgx8uimu8ufcghxagsaiie.streamlit.app/
+    After opening the app, select "🧑 Patient Portal" from the sidebar and submit your report."
     """
 
     response = model.generate_content(

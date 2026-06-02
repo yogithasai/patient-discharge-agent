@@ -28,7 +28,8 @@ from database import (
     add_patient_report,
     get_patient_reports,
     delete_patient,
-    get_latest_followup
+    get_latest_followup,
+    update_followup_status
 )
 
 st.markdown("""
@@ -85,8 +86,8 @@ patients = get_patients()
 
 count = len(patients)
 
-st.sidebar.warning(
-    f"🔔 {count} Patients Pending Follow-Up"
+st.sidebar.info(
+    f"👥 {count} Registered Patients"
 )
 
 
@@ -125,7 +126,6 @@ if menu == "👤 Register Patient":
 
         phone = st.text_input(
             "Phone Number",
-            placeholder="9876543210"
         ).strip()
 
         condition = st.text_input(
@@ -346,7 +346,9 @@ elif menu == "📝 Patient Portal":
 
         if risk == "High":
 
-            send_whatsapp(
+            from notifications import send_doctor_alert
+
+            send_doctor_alert(
                 f"""
         🚨 HIGH RISK PATIENT SELF REPORT
 
@@ -360,17 +362,9 @@ elif menu == "📝 Patient Portal":
 
         Risk: {risk}
 
-        Immediate medical review required.
+        Immediate review required.
         """
             )
-
-        st.success(
-            f"Report Submitted Successfully | Risk: {risk}"
-        )
-
-        st.info(
-            f"Current Status: {status}"
-        )
 
 elif menu == "🩺 Patient Follow-Up":
 
@@ -557,8 +551,12 @@ elif menu == "📊 Dashboard":
     total = len(records)
 
     high = len(
-        [r for r in records if r[7] == "High"]
-    )
+    [
+        r for r in records
+        if r[7] == "High"
+        and r[8] != "Reviewed"
+    ]
+)
 
     medium = len(
         [r for r in records if r[7] == "Medium"]
@@ -569,7 +567,10 @@ elif menu == "📊 Dashboard":
     )
 
     escalated = len(
-        [r for r in records if r[8] == "Escalated"]
+        [
+            r for r in records
+            if r[8] == "Escalated"
+        ]
     )
 
     pending = len(
@@ -817,73 +818,164 @@ elif menu == "💊 Care Reminders":
 
 elif menu == "🚨 Alert Center":
 
-    st.header("🚨 High-Risk Patient Monitoring")
+    st.header("🚨 Healthcare Alert Center")
 
-    for record in high_risk:
+    records = get_followups()
 
-        with st.container():
+    high_risk = [
+        r for r in records
+        if r[7] == "High" and r[8] != "Reviewed"
+    ]
 
-            st.error(
-                f"🚨 HIGH RISK PATIENT: {record[1]}"
-            )
+    st.metric(
+        "Active High-Risk Alerts",
+        len(high_risk)
+    )
 
-            col1, col2 = st.columns(2)
+    st.markdown("---")
 
-            with col1:
-                st.write(
-                    f"🩺 Symptoms: {record[2]}"
+    if not high_risk:
+
+        st.success(
+            "✅ No active high-risk patients."
+        )
+
+    else:
+
+        for record in high_risk:
+
+            with st.container():
+
+                st.error(
+                    f"🚨 HIGH RISK PATIENT: {record[1]}"
                 )
 
-            with col2:
-                st.write(
-                    f"⚠ Risk Level: {record[7]}"
+                col1, col2 = st.columns(2)
+
+                with col1:
+                    st.write(
+                        f"🩺 Symptoms: {record[2]}"
+                    )
+
+                with col2:
+                    st.write(
+                        f"⚠ Risk Level: {record[7]}"
+                    )
+
+                    st.write(
+                        f"📌 Status: {record[8]}"
+                    )
+
+                st.warning(
+                    "Immediate healthcare staff review recommended."
                 )
 
-                st.write(
-                    f"📌 Status: {record[8]}"
-                )
+                action1, action2, action3 = st.columns(3)
 
-            st.warning(
-                "Immediate healthcare staff review recommended."
-            )
+                with action1:
 
-            action1, action2 = st.columns(2)
+                    if st.button(
+                        f"📩 Notify Doctor - {record[0]}"
+                    ):
 
-            with action1:
-
-                if st.button(
-                    f"📩 Notify Doctor - {record[0]}"
-                ):
-
-                    send_doctor_alert(
-                        f"""
+                        send_doctor_alert(
+                            f"""
 HIGH RISK PATIENT
 
 Patient: {record[1]}
 Symptoms: {record[2]}
 Risk: {record[7]}
 """
-                    )
+                        )
 
-                    st.success(
-                        "Doctor notification sent."
-                    )
+                        st.success(
+                            "Doctor notification sent."
+                        )
 
-            with action2:
+                with action2:
 
-                if st.button(
-                    f"📞 Call Patient - {record[0]}"
-                ):
+                    if st.button(
+                        f"📞 Call Patient - {record[0]}"
+                    ):
 
-                    st.info(
-                        "Voice call workflow initiated."
-                    )
+                        st.info(
+                            "Voice call workflow initiated."
+                        )
 
-            st.divider()
+                with action3:
+
+                    if st.button(
+                        f"✅ Mark Reviewed - {record[0]}"
+                    ):
+
+                        update_followup_status(
+                            record[0],
+                            "Reviewed"
+                        )
+
+                        st.success(
+                            "Patient marked as reviewed."
+                        )
+
+                        st.rerun()
+
+                st.divider()
 
 elif menu == "🤖 Follow-Up Agent":
 
+    records = get_followups()
+    reports = get_patient_reports()
+
     st.header("🤖 Follow-Up Agent")
+
+    st.subheader("⚙️ Agent Status")
+
+    col1, col2, col3 = st.columns(3)
+
+    col1.metric(
+        "👥 Patients Monitored",
+        len(get_patients())
+    )
+
+    col2.metric(
+        "🚨 High-Risk Cases",
+        len(
+            [
+                r for r in records
+                if r[7] == "High"
+                and r[8] != "Reviewed"
+            ]
+        )
+    )
+
+    col3.metric(
+        "📝 Reports Received",
+        len(reports)
+    )
+
+    st.info(
+        """
+The Healthcare Follow-Up Agent continuously monitors discharged patients,
+supports medication adherence, tracks recovery progress,
+and escalates high-risk cases to healthcare staff.
+"""
+    )
+
+    st.subheader("📋 Recent Agent Activity")
+
+    st.success(
+        "✅ Welcome messages are sent automatically after patient registration."
+    )
+
+    st.success(
+        "✅ High-risk patients are automatically escalated."
+    )
+
+    st.success(
+        "✅ Reminder engine available through agent_scheduler.py."
+    )
+
+    st.markdown("---")
 
     patient_names = get_patient_names()
 
@@ -919,7 +1011,7 @@ elif menu == "🤖 Follow-Up Agent":
         )
 
         st.info(
-            f"📅 Follow-Up: {patient[7]}"
+            f"📅 Follow-Up Date: {patient[7]}"
         )
 
         st.subheader(
@@ -945,7 +1037,7 @@ Symptoms: {latest_followup[2]}
             )
 
         if st.button(
-            "Generate Follow-Up Message"
+            "📩 Generate & Send Follow-Up Message"
         ):
 
             message = generate_followup_message(

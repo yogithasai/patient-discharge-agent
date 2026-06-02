@@ -294,3 +294,23 @@ def clear_all_data():
 
     conn.commit()
     conn.close()
+
+def update_followup_status(followup_id, new_status):
+
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        UPDATE followups
+        SET status = ?
+        WHERE id = ?
+        """,
+        (
+            new_status,
+            followup_id
+        )
+    )
+
+    conn.commit()
+    conn.close()

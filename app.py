@@ -111,7 +111,7 @@ if menu == "👤 Register Patient":
 
     st.header("Patient Registration")
 
-    with st.form("patient_form"):
+    with st.form("patient_form", clear_on_submit=True):
 
         name = st.text_input("Patient Name")
 
@@ -125,7 +125,7 @@ if menu == "👤 Register Patient":
         phone = st.text_input(
             "Phone Number",
             placeholder="9876543210"
-        )
+        ).strip()
 
         condition = st.text_input(
             "Medical Condition"
@@ -155,7 +155,7 @@ if menu == "👤 Register Patient":
                 "Patient name is required"
             )
 
-        elif len(phone) != 10 or not phone.isdigit():
+        elif not phone.isdigit() or len(phone) != 10:
 
             st.error(
                 "Enter a valid 10-digit phone number"
@@ -185,8 +185,6 @@ if menu == "👤 Register Patient":
                 f"✅ {name} registered successfully"
             )
 
-            st.rerun()
-            
 elif menu == "📋 View Patients":
 
     st.header("📋Patient Records")
@@ -255,6 +253,7 @@ elif menu == "📝 Patient Portal":
         patient_names
     )
 
+    
     symptoms = st.text_area(
         "Current Symptoms"
     )
@@ -359,47 +358,53 @@ elif menu == "🩺 Patient Follow-Up":
                 f"📅 Next Follow-Up Appointment: {patient[7]}"
             )
     
+    with st.form("followup_form", clear_on_submit=True):
 
-    symptoms = st.text_area(
-        "Describe Symptoms"
-    )
+        symptoms = st.text_area(
+            "Describe Symptoms"
+        )
 
-    recovery_status = st.selectbox(
-        "Recovery Progress",
-        [
-            "Improving",
-            "Same",
-            "Worsening"
-        ]
-    )
+        recovery_status = st.selectbox(
+            "Recovery Progress",
+            [
+                "Improving",
+                "Same",
+                "Worsening"
+            ]
+        )
 
-    recovery_score = st.slider(
-        "Recovery Score (1-10)",
-        1,
-        10,
-        5
-    )
-    medication_taken = st.selectbox(
-        "Medication Taken?",
-        ["Yes", "No"]
-    )
+        recovery_score = st.slider(
+            "Recovery Score (1-10)",
+            1,
+            10,
+            5
+        )
 
-    fever = st.selectbox(
-        "Fever?",
-        ["No", "Yes"]
-    )
+        medication_taken = st.selectbox(
+            "Medication Taken?",
+            ["Yes", "No"]
+        )
 
-    pain_level = st.selectbox(
-        "Pain Level",
-        ["None", "Mild", "Moderate", "Severe"]
-    )
+        fever = st.selectbox(
+            "Fever?",
+            ["No", "Yes"]
+        )
 
-    breathing_issue = st.selectbox(
-        "Breathing Difficulty?",
-        ["No", "Yes"]
-    )
+        pain_level = st.selectbox(
+            "Pain Level",
+            ["None", "Mild", "Moderate", "Severe"]
+        )
 
-    if st.button("Assess Risk"):
+        breathing_issue = st.selectbox(
+            "Breathing Difficulty?",
+            ["No", "Yes"]
+        )
+
+        submitted = st.form_submit_button(
+            "Assess Risk"
+        )
+
+    if submitted:
         patient = get_patient_by_name(patient_name)
 
         if not patient:
@@ -410,6 +415,14 @@ elif menu == "🩺 Patient Follow-Up":
 
         from risk_assessment import assess_risk
 
+        if not symptoms.strip():
+
+            st.error(
+                "Please describe patient symptoms"
+            )
+
+            st.stop()
+            
         risk = assess_risk(
             fever,
             pain_level,
@@ -428,8 +441,9 @@ elif menu == "🩺 Patient Follow-Up":
             )
 
         st.success(
-            f"Risk Level: {risk}"
+            f"✅ Assessment Completed | Risk Level: {risk}"
         )
+
         if risk == "High":
 
             from notifications import send_doctor_alert
@@ -639,10 +653,45 @@ elif menu == "📅 Reminder Center":
 
     patients = get_patients()
 
-    st.metric(
-        "Patients Eligible For Reminders",
+    col1, col2 = st.columns(2)
+
+    col1.metric(
+        "💊 Medication Reminders",
         len(patients)
     )
+
+    col2.metric(
+        "📅 Appointment Reminders",
+        len(patients)
+    )
+
+    st.markdown("---")
+
+    st.subheader("📋 Patients Pending Follow-Up")
+
+    if not patients:
+
+        st.info(
+            "No patients available."
+        )
+
+    else:
+
+        for patient in patients:
+
+            with st.container():
+
+                st.info(
+                    f"""
+👤 Patient: {patient[1]}
+
+📞 Phone: {patient[3]}
+
+💊 Medication: {patient[6]}
+
+📅 Follow-Up Date: {patient[7]}
+"""
+                )
 
     st.markdown("---")
 
@@ -655,21 +704,21 @@ elif menu == "📅 Reminder Center":
         for patient in patients:
 
             reminder = f"""
-    Hello {patient[1]},
+Hello {patient[1]},
 
-    💊 Medication Reminder
+💊 Medication Reminder
 
-    Please remember to take:
+Please remember to take:
 
-    {patient[6]}
+{patient[6]}
 
-    Reply if you are experiencing:
-    • Fever
-    • Pain
-    • Breathing difficulty
+Reply if you are experiencing:
+• Fever
+• Pain
+• Breathing difficulty
 
-    Stay healthy.
-    """
+Stay healthy.
+"""
 
             send_whatsapp(
                 patient[3],
@@ -691,18 +740,18 @@ elif menu == "📅 Reminder Center":
         for patient in patients:
 
             reminder = f"""
-            Hello {patient[1]},
+Hello {patient[1]},
 
-            📅 Appointment Reminder
+📅 Appointment Reminder
 
-            Your follow-up appointment is scheduled for:
+Your follow-up appointment is scheduled for:
 
-            {patient[7]}
+{patient[7]}
 
-            Please contact the hospital if you need to reschedule.
+Please contact the hospital if you need to reschedule.
 
-            Thank you.
-            """
+Thank you.
+"""
 
             send_whatsapp(
                 patient[3],
@@ -714,7 +763,7 @@ elif menu == "📅 Reminder Center":
         st.success(
             f"✅ Appointment reminders sent to {sent} patients."
         )
-
+        
 elif menu == "🚨 Staff Alerts":
 
     st.header("🚨 Healthcare Alert Center")
@@ -778,14 +827,22 @@ elif menu == "📩 Patient Outreach":
 
     patient_names = get_patient_names()
 
-    
-    selected_patient = st.selectbox(
-        "Select Patient",
-        patient_names
-    )
+    if not patient_names:
 
+            st.warning(
+                "No registered patients found."
+            )
+
+            st.stop()
+
+    patient_name = st.selectbox(
+            "Select Patient",
+            patient_names
+
+        )
+    
     patient = get_patient_by_name(
-        selected_patient
+        patient_name
     )
 
     if patient:

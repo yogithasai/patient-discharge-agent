@@ -7,7 +7,7 @@ patients = get_patients()
 print("TOTAL PATIENTS:", len(patients))
 
 for p in patients:
-    print(p)
+    print("PATIENT:", p)
 
 today = str(date.today())
 

@@ -39,6 +39,19 @@ from database import init_db
 
 init_db()
 
+import sqlite3
+
+conn = sqlite3.connect("patients.db")
+cursor = conn.cursor()
+
+cursor.execute(
+    "SELECT name FROM sqlite_master WHERE type='table';"
+)
+
+st.write("TABLES:", cursor.fetchall())
+
+conn.close()
+
 st.markdown("""
     <style>
 

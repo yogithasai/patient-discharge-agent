@@ -20,21 +20,33 @@ def init_db():
     """)
 
     cursor.execute("""
-    CREATE TABLE IF NOT EXISTS followups (
+        CREATE TABLE IF NOT EXISTS followups (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            patient_name TEXT,
+            symptoms TEXT,
+            medication_taken TEXT,
+            fever TEXT,
+            pain_level TEXT,
+            breathing_issue TEXT,
+            risk_level TEXT,
+            status TEXT
+        )
+        """)
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS patient_reports (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         patient_name TEXT,
         symptoms TEXT,
         medication_taken TEXT,
         fever TEXT,
-        pain_level TEXT,
-        breathing_issue TEXT,
-        risk_level TEXT
+        report_risk TEXT,
+        report_status TEXT
     )
     """)
 
     conn.commit()
     conn.close()
-
+    
 def add_patient(name, age, phone,
                 condition,
                 discharge_date,
@@ -89,31 +101,43 @@ def add_followup(
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
 
+    if risk_level == "High":
+        status = "Escalated"
+
+    elif risk_level == "Medium":
+        status = "Pending"
+
+    else:
+        status = "Reviewed"
+
     cursor.execute("""
-    INSERT INTO followups
-    (
-        patient_name,
-        symptoms,
-        medication_taken,
-        fever,
-        pain_level,
-        breathing_issue,
-        risk_level
-    )
-    VALUES (?, ?, ?, ?, ?, ?, ?)
-    """,
-    (
-        patient_name,
-        symptoms,
-        medication_taken,
-        fever,
-        pain_level,
-        breathing_issue,
-        risk_level
-    ))
+        INSERT INTO followups
+        (
+            patient_name,
+            symptoms,
+            medication_taken,
+            fever,
+            pain_level,
+            breathing_issue,
+            risk_level,
+            status
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        """,
+        (
+            patient_name,
+            symptoms,
+            medication_taken,
+            fever,
+            pain_level,
+            breathing_issue,
+            risk_level,
+            status
+        ))
 
     conn.commit()
     conn.close()
+
 def get_followups():
 
     conn = sqlite3.connect(DB_NAME)
@@ -160,3 +184,56 @@ def get_patient_names():
     conn.close()
 
     return [n[0] for n in names]
+
+def add_patient_report(
+    patient_name,
+    symptoms,
+    medication_taken,
+    fever,
+    report_risk,
+    report_status
+):
+
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    INSERT INTO patient_reports
+    (
+        patient_name,
+        symptoms,
+        medication_taken,
+        fever,
+        report_risk,
+        report_status
+    )
+    VALUES (?, ?, ?, ?, ?, ?)
+    """,
+    (
+        patient_name,
+        symptoms,
+        medication_taken,
+        fever,
+        report_risk,
+        report_status
+    ))
+
+    conn.commit()
+    conn.close()
+
+def get_patient_reports():
+
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    SELECT *
+    FROM patient_reports
+    ORDER BY id DESC
+    """)
+
+    data = cursor.fetchall()
+
+    conn.close()
+
+    return data

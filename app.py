@@ -24,7 +24,9 @@ from database import (
     add_followup,
     get_followups,
     get_patient_names,
-    get_patient_by_name
+    get_patient_by_name,
+    add_patient_report,
+    get_patient_reports
 )
 
 st.markdown("""
@@ -71,7 +73,8 @@ menu = st.sidebar.selectbox(
         "📩 Patient Outreach",
         "📅 Reminder Center",
         "🚨 Staff Alerts",
-        "📋 View Patients"
+        "📋 View Patients",
+        "📝 Patient Portal"
     ]
 )
 
@@ -83,6 +86,7 @@ count = len(patients)
 st.sidebar.warning(
     f"🔔 {count} Patients Pending Follow-Up"
 )
+
 
 with st.sidebar.expander(
     "View Follow-Up Queue"
@@ -365,6 +369,20 @@ elif menu == "📊 Dashboard":
         [r for r in records if r[7] == "Low"]
     )
 
+    escalated = len(
+        [r for r in records if r[8] == "Escalated"]
+    )
+
+    pending = len(
+        [r for r in records if r[8] == "Pending"]
+    )
+
+    reviewed = len(
+        [r for r in records if r[8] == "Reviewed"]
+    )
+
+    pending_followups = len(patients)
+
     col1, col2, col3, col4 = st.columns(4)
 
     col1.metric(
@@ -388,6 +406,26 @@ elif menu == "📊 Dashboard":
     )
 
     st.markdown("---")
+    st.subheader("📌 Case Status Overview")
+
+    c1, c2, c3 = st.columns(3)
+
+    c1.metric(
+        "🚨 Escalated",
+        escalated
+    )
+
+    c2.metric(
+        "⏳ Pending",
+        pending
+    )
+
+    c3.metric(
+        "✅ Reviewed",
+        reviewed
+    )
+
+    st.markdown("---")
 
     st.subheader("🏥 System Overview")
 
@@ -405,23 +443,35 @@ elif menu == "📊 Dashboard":
     """
     )
 
-    st.subheader("Recent Assessments")
+    st.subheader("🕒 Recent Assessments")
 
-    for record in records:
+    for record in reversed(records[-5:]):
 
-        st.write(
-            f"👤 {record[1]}"
-        )
+        with st.container():
 
-        st.write(
-            f"⚠ Risk: {record[7]}"
-        )
+            if record[7] == "High":
 
-        st.write(
-            f"🩺 Symptoms: {record[2]}"
-        )
+                st.error(
+                        f"🚨 {record[1]} | Risk: {record[7]} | Status: {record[8]}"
+                    )
 
-        st.write("---")
+            elif record[7] == "Medium":
+
+                st.warning(
+                            f"⚠ {record[1]} | Risk: {record[7]} | Status: {record[8]}"
+                        )
+
+            else:
+
+                st.success(
+                        f"✅ {record[1]} | Risk: {record[7]} | Status: {record[8]}"
+                    )
+
+            st.write(
+                f"🩺 Symptoms: {record[2]}"
+            )
+
+            st.divider()
 
 elif menu == "📅 Reminder Center":
 
@@ -481,18 +531,18 @@ elif menu == "📅 Reminder Center":
         for patient in patients:
 
             reminder = f"""
-Hello {patient[1]},
+            Hello {patient[1]},
 
-📅 Appointment Reminder
+            📅 Appointment Reminder
 
-Your follow-up appointment is scheduled for:
+            Your follow-up appointment is scheduled for:
 
-{patient[7]}
+            {patient[7]}
 
-Please contact the hospital if you need to reschedule.
+            Please contact the hospital if you need to reschedule.
 
-Thank you.
-"""
+            Thank you.
+            """
 
             send_whatsapp(
                 patient[3],
@@ -551,6 +601,10 @@ elif menu == "🚨 Staff Alerts":
 
                     st.write(
                         f"⚠ Risk Level: {record[7]}"
+                    )
+
+                    st.write(
+                        f"📌 Status: {record[8]}"
                     )
 
                 st.warning(

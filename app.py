@@ -22,7 +22,10 @@ from database_supabase import (
     add_patient,
     get_patients,
     get_patient_names,
-    get_patient_by_name
+    get_patient_by_name,
+    add_doctor,
+    doctor_login,
+    get_doctors
 )
 
 from database import (
@@ -84,7 +87,8 @@ menu = st.sidebar.selectbox(
         "💊 Care Reminders",
         "🚨 Alert Center",
         "📋 View Patients",
-        "📝 Patient Portal"
+        "📝 Patient Portal",
+        "👨‍⚕️ Doctor Portal"
     ]
 )
 
@@ -1077,3 +1081,74 @@ Symptoms: {latest_followup[2]}
             st.write(
                 f"Message SID: {sid}"
             )
+
+elif menu == "👨‍⚕️ Doctor Portal":
+    tab1, tab2, tab3 = st.tabs([
+        "Register Doctor",
+        "Doctor Login",
+        "Doctor Dashboard"
+    ])
+    with tab1:
+        st.subheader("Doctor Registration")
+
+        doctor_name = st.text_input("Doctor Name")
+        specialization = st.text_input("Specialization")
+        email = st.text_input("Email")
+        password = st.text_input("Password", type="password")
+        phone = st.text_input("Phone")
+
+        if st.button("Register Doctor"):
+            add_doctor(
+                doctor_name,
+                specialization,
+                email,
+                password,
+                phone
+            )
+            st.success("Doctor Registered Successfully")
+
+    with tab2:
+        st.subheader("Doctor Login")
+
+        email = st.text_input("Login Email")
+        password = st.text_input(
+            "Login Password",
+            type="password"
+        )
+
+        if st.button("Login"):
+            doctor = doctor_login(
+                email,
+                password
+            )
+
+            if doctor:
+                st.session_state["doctor"] = doctor
+                st.success(
+                    f"Welcome Dr. {doctor['name']}"
+                )
+            else:
+                st.error(
+                    "Invalid Credentials"
+                )
+    with tab3:
+
+        st.subheader("Doctor Dashboard")
+
+        if "doctor" not in st.session_state:
+
+            st.warning(
+            "Please Login First"
+        )
+
+        else:
+
+         doctor = st.session_state["doctor"]
+
+        st.success(
+                f"Logged in as Dr. {doctor['name']}"
+            )
+
+        st.write("Specialization:", doctor["specialization"])
+        st.write("Email:", doctor["email"])
+        st.write("Phone:", doctor["phone"])

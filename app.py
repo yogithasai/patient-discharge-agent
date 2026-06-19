@@ -1132,23 +1132,30 @@ elif menu == "👨‍⚕️ Doctor Portal":
                     "Invalid Credentials"
                 )
     with tab3:
-
+    
         st.subheader("Doctor Dashboard")
 
         if "doctor" not in st.session_state:
-
-            st.warning(
-            "Please Login First"
-        )
+            st.warning("Please Login First")
 
         else:
-
-         doctor = st.session_state["doctor"]
-
-        st.success(
+            doctor = st.session_state["doctor"]
+            
+            st.success(
                 f"Logged in as Dr. {doctor['name']}"
             )
 
-        st.write("Specialization:", doctor["specialization"])
-        st.write("Email:", doctor["email"])
-        st.write("Phone:", doctor["phone"])
+            st.write(
+                "Specialization:",
+                doctor["specialization"]
+            )
+
+            st.write(
+                "Email:",
+                doctor["email"]
+            )
+
+            st.write(
+                "Phone:",
+                doctor["phone"]
+            )

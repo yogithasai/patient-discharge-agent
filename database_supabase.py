@@ -11,9 +11,9 @@ def add_patient(
     condition,
     discharge_date,
     medications,
-    followup_date
+    followup_date,
+    doctor_id
 ):
-
     supabase.table(
         "patients"
     ).insert(

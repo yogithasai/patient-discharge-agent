@@ -16,19 +16,20 @@ def add_patient(
 ):
 
     supabase.table(
-    "patients"
-).insert(
-    {
-        "name": name,
-        "age": age,
-        "phone": phone,
-        "condition": condition,
-        "discharge_date": str(discharge_date),
-        "medications": medications,
-        "followup_date": str(followup_date),
-        "doctor_id": doctor_id
-    }
-).execute()
+        "patients"
+    ).insert(
+        {
+            "name": name,
+            "age": age,
+            "phone": phone,
+            "condition": condition,
+            "discharge_date": str(discharge_date),
+            "medications": medications,
+            "followup_date": str(followup_date),
+            "doctor_id": doctor_id
+        }
+    ).execute()
+
 def get_patients():
 
     response = supabase.table(

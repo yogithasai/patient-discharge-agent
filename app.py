@@ -155,6 +155,22 @@ if menu == "👤 Register Patient":
             "Follow-up Date"
         )
 
+        doctors = get_doctors()
+
+        if doctors:
+
+            doctor_names = [doctor["name"] for doctor in doctors]
+
+            selected_doctor = st.selectbox(
+                "Assign Doctor",
+                doctor_names
+            )
+
+        else:
+
+            st.warning("No doctors registered yet.")
+            selected_doctor = None
+            
         submitted = st.form_submit_button(
             "Save Patient"
         )
@@ -183,6 +199,16 @@ if menu == "👤 Register Patient":
 
             formatted_phone = "+91" + phone
 
+            doctor_id = None
+
+            if selected_doctor:
+
+                doctor_id = next(
+                    doctor["id"]
+                    for doctor in doctors
+                    if doctor["name"] == selected_doctor
+                )
+
             add_patient(
                 name,
                 age,
@@ -190,7 +216,8 @@ if menu == "👤 Register Patient":
                 condition,
                 discharge_date,
                 medications,
-                followup_date
+                followup_date,
+                doctor_id
             )
 
             st.success(

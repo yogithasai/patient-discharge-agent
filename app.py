@@ -1173,6 +1173,25 @@ elif menu == "👨‍⚕️ Doctor Portal":
                 doctor["id"]
             )
 
+            st.success(
+                f"Logged in as Dr. {doctor['name']}"
+            )
+
+            st.write(
+                "Specialization:",
+                doctor["specialization"]
+            )
+
+            st.write(
+                "Email:",
+                doctor["email"]
+            )
+
+            st.write(
+                "Phone:",
+                doctor["phone"]
+            )
+
             st.subheader("Assigned Patients")
 
             if patients:
@@ -1199,21 +1218,4 @@ elif menu == "👨‍⚕️ Doctor Portal":
 
                 st.info("No patients assigned.")
             
-            st.success(
-                f"Logged in as Dr. {doctor['name']}"
-            )
-
-            st.write(
-                "Specialization:",
-                doctor["specialization"]
-            )
-
-            st.write(
-                "Email:",
-                doctor["email"]
-            )
-
-            st.write(
-                "Phone:",
-                doctor["phone"]
-            )
+            

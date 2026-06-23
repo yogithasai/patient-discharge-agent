@@ -136,3 +136,14 @@ def doctor_login(email, password):
         return response.data[0]
 
     return None
+
+def get_patients_by_doctor(doctor_id):
+
+    response = supabase.table(
+        "patients"
+    ).select("*").eq(
+        "doctor_id",
+        doctor_id
+    ).execute()
+
+    return response.data

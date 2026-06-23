@@ -25,7 +25,8 @@ from database_supabase import (
     get_patient_by_name,
     add_doctor,
     doctor_login,
-    get_doctors
+    get_doctors,
+    get_patients_by_doctor
 )
 
 from database import (
@@ -1167,6 +1168,36 @@ elif menu == "👨‍⚕️ Doctor Portal":
 
         else:
             doctor = st.session_state["doctor"]
+
+            patients = get_patients_by_doctor(
+                doctor["id"]
+            )
+
+            st.subheader("Assigned Patients")
+
+            if patients:
+
+                for patient in patients:
+
+                    st.container()
+
+                    st.markdown(
+                        f"""
+            ### 👤 {patient['name']}
+
+            **Condition:** {patient['condition']}
+
+            **Follow-up Date:** {patient['followup_date']}
+
+            **Phone:** {patient['phone']}
+            """
+                    )
+
+                    st.divider()
+
+            else:
+
+                st.info("No patients assigned.")
             
             st.success(
                 f"Logged in as Dr. {doctor['name']}"

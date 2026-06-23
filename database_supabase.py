@@ -148,3 +148,36 @@ def get_patients_by_doctor(doctor_id):
     ).execute()
 
     return response.data
+
+def add_medication_log(
+    patient_id,
+    medication_name,
+    taken,
+    taken_time,
+    meal_status,
+    side_effects
+):
+
+    supabase.table(
+        "medication_logs"
+    ).insert(
+        {
+            "patient_id": patient_id,
+            "medication_name": medication_name,
+            "taken": taken,
+            "taken_time": taken_time,
+            "meal_status": meal_status,
+            "side_effects": side_effects
+        }
+    ).execute()
+
+def get_medication_logs(patient_id):
+
+    response = supabase.table(
+        "medication_logs"
+    ).select("*").eq(
+        "patient_id",
+        patient_id
+    ).execute()
+
+    return response.data

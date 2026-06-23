@@ -26,7 +26,9 @@ from database_supabase import (
     add_doctor,
     doctor_login,
     get_doctors,
-    get_patients_by_doctor
+    get_patients_by_doctor,
+    add_medication_log,
+    get_medication_logs
 )
 
 from database import (
@@ -86,6 +88,7 @@ menu = st.sidebar.selectbox(
         "🩺 Patient Follow-Up",
         "🤖 Follow-Up Agent",
         "💊 Care Reminders",
+        "💊 Medication Feedback",
         "🚨 Alert Center",
         "📋 View Patients",
         "📝 Patient Portal",

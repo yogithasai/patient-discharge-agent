@@ -15,7 +15,7 @@ def add_patient(
     doctor_id
 ):
 
-    supabase.table(
+    response = supabase.table(
         "patients"
     ).insert(
         {
@@ -29,6 +29,9 @@ def add_patient(
             "doctor_id": doctor_id
         }
     ).execute()
+
+    return response.data[0]
+
 
 def get_patients():
 
@@ -92,6 +95,20 @@ def get_patient_by_name(name):
         row["medications"],
         row["followup_date"]
     )
+
+def get_patient_details(name):
+
+    response = supabase.table(
+        "patients"
+    ).select("*").eq(
+        "name",
+        name
+    ).execute()
+
+    if not response.data:
+        return None
+
+    return response.data[0]
 
 def add_doctor(
     name,
@@ -171,6 +188,30 @@ def add_medication_log(
         }
     ).execute()
 
+def add_vitals(
+    patient_id,
+    temperature,
+    blood_pressure,
+    pulse_rate,
+    spo2,
+    weight,
+    blood_sugar
+):
+
+    supabase.table(
+        "vitals"
+    ).insert(
+        {
+            "patient_id": patient_id,
+            "temperature": temperature,
+            "blood_pressure": blood_pressure,
+            "pulse_rate": pulse_rate,
+            "spo2": spo2,
+            "weight": weight,
+            "blood_sugar": blood_sugar
+        }
+    ).execute()
+
 def get_medication_logs(patient_id):
 
     response = supabase.table(
@@ -181,3 +222,47 @@ def get_medication_logs(patient_id):
     ).execute()
 
     return response.data
+
+def get_patient_vitals(patient_id):
+
+    response = supabase.table(
+        "vitals"
+    ).select("*").eq(
+        "patient_id",
+        patient_id
+    ).order(
+        "created_at",
+        desc=True
+    ).execute()
+
+    return response.data
+
+def get_patient_by_token(token):
+
+    response = supabase.table(
+        "patients"
+    ).select("*").eq(
+        "access_token",
+        token
+    ).execute()
+
+    if not response.data:
+        return None
+
+    return response.data[0]
+
+def get_patient_token(name):
+
+    response = supabase.table(
+        "patients"
+    ).select(
+        "access_token"
+    ).eq(
+        "name",
+        name
+    ).execute()
+
+    if not response.data:
+        return None
+
+    return response.data[0]["access_token"]

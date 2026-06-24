@@ -28,7 +28,8 @@ from database_supabase import (
     get_doctors,
     get_patients_by_doctor,
     add_medication_log,
-    get_medication_logs
+    get_medication_logs,
+    get_patient_by_token
 )
 
 from database import (
@@ -222,6 +223,9 @@ if menu == "👤 Register Patient":
                 followup_date,
                 doctor_id
             )
+            patient = get_patient_by_name(name)
+
+            token = patient["access_token"]
 
             st.success(
                 f"✅ {name} registered successfully"

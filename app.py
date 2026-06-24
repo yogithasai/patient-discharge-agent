@@ -29,7 +29,9 @@ from database_supabase import (
     get_patients_by_doctor,
     add_medication_log,
     get_medication_logs,
-    get_patient_by_token
+    get_patient_by_token,
+    get_patient_details,
+    add_vitals
 )
 
 from database import (
@@ -223,35 +225,55 @@ if menu == "👤 Register Patient":
                 followup_date,
                 doctor_id
             )
-            patient = get_patient_by_name(name)
+            patient = get_patient_details(name)
 
             token = patient["access_token"]
+
+            portal_link = (
+                    f"https://patient-discharge-agent-wgx8uimu8ufcghxagsaiie.streamlit.app/?token={token}"
+            )
 
             st.success(
                 f"✅ {name} registered successfully"
             )
 
             welcome_message = f"""
-                    🏥 Welcome to the Patient Recovery Monitoring Program
+                🏥 Welcome to the Patient Recovery Monitoring Program
 
-                    Hello {name},
+                Hello {name},  
 
-                    You have been successfully enrolled in our post-discharge follow-up program.
+                You have been successfully enrolled in our AI-powered post-discharge monitoring program.
 
-                    You will receive:
+                ━━━━━━━━━━━━━━━━━━━━━━
 
-                    ✅ Medication reminders
-                    ✅ Appointment reminders
-                    ✅ Recovery check-ins
+                💊 Medication Reminders
 
-                    If you experience fever, pain, or breathing difficulties, please report them immediately.
-                    https://patient-discharge-agent-wgx8uimu8ufcghxagsaiie.streamlit.app/
-                    
-                    After opening the app, select "🧑 Patient Portal" from the sidebar and submit your report.
+                🩺 Daily Recovery Tracking
 
+                📅 Follow-up Monitoring
 
-                    Wishing you a smooth recovery.
-                    """
+                ━━━━━━━━━━━━━━━━━━━━━━
+
+                Please use your personal recovery link below to submit your daily health updates.
+
+                {portal_link}
+
+                Each day you can report:
+
+                • Medication taken
+                • Time of medication
+                • Before/After meal
+                • Temperature
+                • Blood Pressure
+                • Pulse
+                • SpO₂
+                • Symptoms
+                • Side Effects
+
+                Your doctor will automatically receive your recovery report before your follow-up visit.
+
+                We wish you a smooth and speedy recovery.
+                """
 
             send_whatsapp(
                         formatted_phone,
@@ -329,12 +351,46 @@ elif menu == "📝 Patient Portal":
 
     st.header("📝 Daily Recovery Report")
 
-    patient_names = get_patient_names()
+    params = st.query_params
 
-    selected_patient = st.selectbox(
-        "Select Patient",
-        patient_names
-    )
+    token = params.get("token", None)
+
+    if token:
+
+        patient = get_patient_by_token(token)
+
+        if not patient:
+
+            st.error("Invalid patient access link.")
+            st.stop()
+
+        patient_id = patient["id"]
+        selected_patient = patient["name"]
+
+        st.success(f"Welcome {selected_patient} 👋")
+
+        st.info(f"""
+    🏥 Condition: {patient['condition']}
+
+    💊 Medication: {patient['medications']}
+
+    📅 Follow-Up Date: {patient['followup_date']}
+    """)
+
+    else:
+
+        st.warning("Demo Mode (No secure patient link detected)")
+
+        patient_names = get_patient_names()
+
+        selected_patient = st.selectbox(
+            "Select Patient",
+            patient_names
+        )
+
+        patient = get_patient_details(selected_patient)
+
+        patient_id = patient["id"]
 
     with st.form("patient_report_form", clear_on_submit=True):
 
@@ -455,31 +511,49 @@ elif menu == "📝 Patient Portal":
         )
 
     if submitted:
+        add_medication_log(
+        patient_id,
+        patient["medications"],
+        medication_taken == "Yes",
+        str(medication_time),
+        meal_status,
+        side_effects
+    )
+    
+        add_vitals(
+        patient_id,
+        temperature,
+        blood_pressure,
+        pulse,
+        spo2,
+        weight,
+        blood_sugar
+    )
 
-        score = 0
+    score = 0
 
-        if fever == "Yes":
+    if fever == "Yes":
             score += 4
 
-        if medication_taken == "No":
+    if medication_taken == "No":
             score += 3
 
-        if len(symptoms) > 30:
+    if len(symptoms) > 30:
             score += 3
 
-        if score >= 7:
+    if score >= 7:
             risk = "High"
             status = "Escalated"
 
-        elif score >= 4:
+    elif score >= 4:
             risk = "Medium"
             status = "Pending"
 
-        else:
+    else:
             risk = "Low"
             status = "Reviewed"
 
-        add_patient_report(
+    add_patient_report(
             selected_patient,
             symptoms,
             medication_taken,
@@ -488,7 +562,7 @@ elif menu == "📝 Patient Portal":
             status
         )
 
-        if risk == "High":
+    if risk == "High":
 
             from notifications import send_doctor_alert
 

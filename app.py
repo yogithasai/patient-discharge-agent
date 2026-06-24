@@ -88,7 +88,6 @@ menu = st.sidebar.selectbox(
         "🩺 Patient Follow-Up",
         "🤖 Follow-Up Agent",
         "💊 Care Reminders",
-        "💊 Medication Feedback",
         "🚨 Alert Center",
         "📋 View Patients",
         "📝 Patient Portal",
@@ -956,63 +955,6 @@ elif menu == "💊 Care Reminders":
         )
 
     st.markdown("---")
-
-elif menu == "💊 Medication Feedback":
-
-    st.header("💊 Medication Feedback")
-
-    patient_names = get_patient_names()
-
-    patient_name = st.selectbox(
-        "Select Patient",
-        patient_names
-    )
-
-    patient = get_patient_by_name(patient_name)
-
-    st.info(f"Medication: {patient[6]}")
-
-    with st.form("medication_feedback"):
-
-        taken = st.radio(
-            "Did you take your medication?",
-            ["Yes", "No"]
-        )
-
-        taken_time = st.time_input(
-            "Time Taken"
-        )
-
-        meal_status = st.selectbox(
-            "Meal Status",
-            [
-                "Before Meal",
-                "After Meal"
-            ]
-        )
-
-        side_effects = st.text_area(
-            "Any Side Effects?"
-        )
-
-        submitted = st.form_submit_button(
-            "Submit"
-        )
-
-    if submitted:
-
-        add_medication_log(
-            patient[0],
-            patient[6],
-            taken == "Yes",
-            str(taken_time),
-            meal_status,
-            side_effects
-        )
-
-        st.success(
-            "Medication feedback submitted successfully."
-        )
 
 elif menu == "🚨 Alert Center":
 

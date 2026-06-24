@@ -27,7 +27,8 @@ from database_supabase import (
     doctor_login,
     get_doctors,
     get_patients_by_doctor,
-    add_medication_log
+    add_medication_log,
+    get_medication_logs
 )
 
 from database import (

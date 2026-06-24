@@ -324,7 +324,7 @@ elif menu == "📋 View Patients":
 
 elif menu == "📝 Patient Portal":
 
-    st.header("📝 Patient Self-Report Portal")
+    st.header("📝 Daily Recovery Report")
 
     patient_names = get_patient_names()
 
@@ -333,27 +333,122 @@ elif menu == "📝 Patient Portal":
         patient_names
     )
 
-    with st.form(
-    "patient_report_form",
-    clear_on_submit=True
-):
+    with st.form("patient_report_form", clear_on_submit=True):
+
+        st.subheader("💊 Medication Compliance")
+
+        medication_taken = st.radio(
+            "Did you take today's medication?",
+            ["Yes", "No"]
+        )
+
+        medication_time = st.time_input(
+            "Time Taken"
+        )
+
+        meal_status = st.selectbox(
+            "Medication Taken",
+            [
+                "Before Meal",
+                "After Meal"
+            ]
+        )
+
+        missed_dose = st.radio(
+            "Did you miss any dose today?",
+            ["No", "Yes"]
+        )
+
+        side_effects = st.text_area(
+            "Side Effects (if any)"
+        )
+
+        st.divider()
+
+        st.subheader("❤️ Today's Vitals")
+
+        temperature = st.number_input(
+            "Temperature (°C)",
+            95.0,
+            110.0,
+            98.6
+        )
+
+        blood_pressure = st.text_input(
+            "Blood Pressure (Example: 120/80)"
+        )
+
+        pulse = st.number_input(
+            "Pulse Rate",
+            40,
+            200,
+            72
+        )
+
+        spo2 = st.number_input(
+            "SpO₂ (%)",
+            70,
+            100,
+            98
+        )
+
+        weight = st.number_input(
+            "Weight (kg)",
+            20.0,
+            200.0,
+            60.0
+        )
+
+        blood_sugar = st.number_input(
+            "Blood Sugar (mg/dL)",
+            50,
+            500,
+            100
+        )
+
+        st.divider()
+
+        st.subheader("🩺 Symptoms")
 
         symptoms = st.text_area(
             "Current Symptoms"
         )
 
-        medication_taken = st.selectbox(
-            "Medication Taken?",
-            ["Yes", "No"]
-        )
-
-        fever = st.selectbox(
-            "Do you currently have fever?",
+        fever = st.radio(
+            "Fever",
             ["No", "Yes"]
         )
 
+        pain_level = st.selectbox(
+            "Pain Level",
+            [
+                "None",
+                "Mild",
+                "Moderate",
+                "Severe"
+            ]
+        )
+
+        breathing_issue = st.radio(
+            "Breathing Difficulty",
+            ["No", "Yes"]
+        )
+
+        recovery_score = st.slider(
+            "Recovery Score",
+            1,
+            10,
+            5
+        )
+
+        st.divider()
+
+        notes = st.text_area(
+            "Additional Notes"
+        )
+
         submitted = st.form_submit_button(
-            "Submit Self Report"
+            "Submit Daily Report"
         )
 
     if submitted:
